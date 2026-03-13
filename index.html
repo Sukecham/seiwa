@@ -1,0 +1,447 @@
+---
+---
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>DX Document Portal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    :root{
+      --bg: #0b1020;
+      --bg-soft: #121a30;
+      --panel: rgba(255,255,255,0.08);
+      --panel-strong: rgba(255,255,255,0.12);
+      --border: rgba(255,255,255,0.14);
+      --text: #eef2ff;
+      --muted: #a9b4d0;
+      --accent: #7dd3fc;
+      --accent-2: #a78bfa;
+      --shadow: 0 20px 60px rgba(0,0,0,.35);
+      --radius-xl: 24px;
+      --radius-lg: 18px;
+      --radius-md: 14px;
+      --max-width: 1180px;
+    }
+
+    *{
+      box-sizing: border-box;
+    }
+
+    html, body{
+      margin: 0;
+      padding: 0;
+    }
+
+    body{
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        "Hiragino Sans",
+        "Hiragino Kaku Gothic ProN",
+        "Yu Gothic",
+        "Noto Sans JP",
+        sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(125,211,252,.14), transparent 30%),
+        radial-gradient(circle at top right, rgba(167,139,250,.14), transparent 28%),
+        linear-gradient(180deg, #0a0f1e 0%, #0d1326 55%, #0b1020 100%);
+      min-height: 100vh;
+      line-height: 1.65;
+      letter-spacing: .01em;
+    }
+
+    a{
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .container{
+      width: min(var(--max-width), calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .hero{
+      position: relative;
+      padding: 72px 0 40px;
+      overflow: hidden;
+    }
+
+    .hero::before{
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(135deg, rgba(125,211,252,.10), rgba(167,139,250,.08));
+      pointer-events: none;
+    }
+
+    .hero-inner{
+      position: relative;
+      z-index: 1;
+      display: grid;
+      gap: 18px;
+    }
+
+    .eyebrow{
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      width: fit-content;
+      padding: 8px 14px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.05);
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
+    .eyebrow::before{
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: 0 0 16px rgba(125,211,252,.7);
+    }
+
+    h1{
+      margin: 0;
+      font-size: clamp(2rem, 4vw, 4rem);
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+      font-weight: 800;
+    }
+
+    .hero-sub{
+      max-width: 760px;
+      margin: 0;
+      color: var(--muted);
+      font-size: clamp(0.98rem, 1.4vw, 1.12rem);
+    }
+
+    .hero-panel{
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .stat{
+      padding: 18px 20px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      background: rgba(255,255,255,.05);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: var(--shadow);
+    }
+
+    .stat-label{
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .stat-value{
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .main{
+      padding: 12px 0 80px;
+    }
+
+    .section-head{
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    .section-title{
+      margin: 0;
+      font-size: clamp(1.3rem, 2vw, 1.8rem);
+      font-weight: 750;
+      letter-spacing: -0.02em;
+    }
+
+    .section-note{
+      margin: 0;
+      color: var(--muted);
+      font-size: .95rem;
+    }
+
+    .docs-grid{
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 18px;
+    }
+
+    .doc-card{
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      min-height: 220px;
+      padding: 22px;
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--border);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.05));
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+      transition:
+        transform .22s ease,
+        border-color .22s ease,
+        background .22s ease,
+        box-shadow .22s ease;
+      overflow: hidden;
+    }
+
+    .doc-card::before{
+      content: "";
+      position: absolute;
+      inset: auto -20% -40% auto;
+      width: 180px;
+      height: 180px;
+      background: radial-gradient(circle, rgba(125,211,252,.16), transparent 65%);
+      pointer-events: none;
+    }
+
+    .doc-card:hover{
+      transform: translateY(-6px);
+      border-color: rgba(125,211,252,.35);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.06));
+      box-shadow: 0 24px 70px rgba(0,0,0,.42);
+    }
+
+    .doc-top{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .doc-icon{
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      background:
+        linear-gradient(135deg, rgba(125,211,252,.24), rgba(167,139,250,.24));
+      border: 1px solid rgba(255,255,255,.14);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.10);
+      font-size: 22px;
+    }
+
+    .doc-badge{
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      background: rgba(255,255,255,.04);
+      white-space: nowrap;
+    }
+
+    .doc-title{
+      margin: 0;
+      font-size: 1.12rem;
+      line-height: 1.35;
+      font-weight: 750;
+      letter-spacing: -0.01em;
+      word-break: break-word;
+    }
+
+    .doc-path{
+      margin: 0;
+      color: var(--muted);
+      font-size: .9rem;
+      word-break: break-all;
+    }
+
+    .doc-spacer{
+      flex: 1 1 auto;
+    }
+
+    .doc-link{
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      width: fit-content;
+      padding: 11px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(125,211,252,.22);
+      color: #dff6ff;
+      background: linear-gradient(135deg, rgba(125,211,252,.14), rgba(167,139,250,.12));
+      font-weight: 700;
+      transition: transform .18s ease, background .18s ease, border-color .18s ease;
+    }
+
+    .doc-link:hover{
+      transform: translateX(2px);
+      border-color: rgba(125,211,252,.4);
+      background: linear-gradient(135deg, rgba(125,211,252,.20), rgba(167,139,250,.16));
+    }
+
+    .empty{
+      padding: 36px 28px;
+      border-radius: var(--radius-xl);
+      border: 1px dashed rgba(255,255,255,.18);
+      background: rgba(255,255,255,.04);
+      color: var(--muted);
+      text-align: center;
+      font-size: 1rem;
+    }
+
+    footer{
+      padding: 0 0 42px;
+    }
+
+    .footer-box{
+      border-top: 1px solid rgba(255,255,255,.10);
+      padding-top: 18px;
+      color: var(--muted);
+      font-size: .92rem;
+    }
+
+    @media (max-width: 860px){
+      .hero{
+        padding-top: 52px;
+      }
+
+      .hero-panel{
+        grid-template-columns: 1fr;
+      }
+
+      .section-head{
+        align-items: start;
+        flex-direction: column;
+      }
+    }
+
+    @media (max-width: 560px){
+      .container{
+        width: min(100% - 20px, var(--max-width));
+      }
+
+      .doc-card{
+        min-height: 200px;
+        padding: 18px;
+      }
+
+      .doc-icon{
+        width: 42px;
+        height: 42px;
+        border-radius: 14px;
+        font-size: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  {% assign html_pages = site.pages | where_exp: "page", "page.ext == '.html' and page.path != 'index.html'" %}
+
+  <section class="hero">
+    <div class="container hero-inner">
+      <div class="eyebrow">Medical DX Documentation Hub</div>
+
+      <h1>DX Document Portal</h1>
+
+      <p class="hero-sub">
+        業務棚卸し、スイムレーン、ボトルネック分析、DX設計資料を一覧で参照するためのポータルです。
+        Slackでは要約やリンクを共有し、本ページを「完成版ドキュメントの閲覧入口」として利用する想定です。
+      </p>
+
+      <div class="hero-panel">
+        <div class="stat">
+          <div class="stat-label">Document Count</div>
+          <div class="stat-value">{{ html_pages | size }} files</div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-label">Site Type</div>
+          <div class="stat-value">Static HTML / GitHub Pages</div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-label">Use Case</div>
+          <div class="stat-value">Workflow Analysis & DX Design</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <main class="main">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <h2 class="section-title">Documents</h2>
+          <p class="section-note">index.html を除く静的HTMLページのみを表示しています。</p>
+        </div>
+      </div>
+
+      {% if html_pages.size > 0 %}
+        <div class="docs-grid">
+          {% for page in html_pages %}
+            <article class="doc-card">
+              <div class="doc-top">
+                <div class="doc-icon">📄</div>
+                <div class="doc-badge">HTML</div>
+              </div>
+
+              <div>
+                <h3 class="doc-title">{{ page.name | replace: ".html", "" }}</h3>
+                <p class="doc-path">{{ page.path }}</p>
+              </div>
+
+              <div class="doc-spacer"></div>
+
+              <a class="doc-link" href="{{ page.url }}">
+                <span>Open Document</span>
+                <span>→</span>
+              </a>
+            </article>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty">
+          表示対象のHTMLファイルがまだありません。  
+          index.html 以外の静的HTMLをリポジトリに追加すると、ここに自動表示されます。
+        </div>
+      {% endif %}
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="footer-box">
+        Built with GitHub Pages / Jekyll · Static document index for workflow visualization and DX architecture
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
