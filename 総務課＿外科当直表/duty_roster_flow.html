@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>外科系日直・宿直当番表作成 ─ 業務フロー分析</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700;800&family=M+PLUS+1:wght@400;500;700&display=swap" rel="stylesheet" />
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        fontFamily: '"M PLUS 1", "Noto Sans JP", sans-serif',
+        fontSize: '14px',
+        primaryColor: '#e0e7ff',
+        lineColor: '#64748b',
+        primaryTextColor: '#1e293b',
+        secondaryColor: '#d1fae5',
+        tertiaryColor: '#fef3c7'
+      },
+      flowchart: {
+        htmlLabels: true,
+        curve: 'basis',
+        padding: 18,
+        nodeSpacing: 30,
+        rankSpacing: 40,
+        useMaxWidth: true
+      }
+    });
+  </script>
+  <style>
+    :root {
+      --bg-base: #f8f7f4;
+      --bg-card: #ffffff;
+      --ink-primary: #1a1a2e;
+      --ink-secondary: #4a4a68;
+      --ink-muted: #8888a0;
+      --accent-red: #dc2626;
+      --accent-blue: #4338ca;
+      --accent-green: #059669;
+      --accent-amber: #d97706;
+      --lane-physical: #fffbeb;
+      --lane-human: #eef2ff;
+      --lane-system: #ecfdf5;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Noto Sans JP', sans-serif;
+      background: var(--bg-base);
+      color: var(--ink-primary);
+      min-height: 100vh;
+    }
+
+    /* Subtle grid texture */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,0,0,.018) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,0,0,.018) 1px, transparent 1px);
+      background-size: 28px 28px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .content-wrapper { position: relative; z-index: 1; }
+
+    /* Header */
+    .header-bar {
+      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #1e1b4b 100%);
+      color: #fff;
+      padding: 2.5rem 2rem 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .header-bar::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--accent-amber), var(--accent-red), var(--accent-blue), var(--accent-green));
+    }
+    .header-bar .deco-circle {
+      position: absolute;
+      border-radius: 50%;
+      opacity: .07;
+      background: #fff;
+    }
+
+    /* Badge */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: .78rem;
+      font-weight: 500;
+      padding: 4px 14px;
+      border-radius: 999px;
+      backdrop-filter: blur(4px);
+    }
+    .badge-freq { background: rgba(250,204,21,.2); border: 1px solid rgba(250,204,21,.45); color: #fef08a; }
+    .badge-time { background: rgba(167,139,250,.2); border: 1px solid rgba(167,139,250,.45); color: #c4b5fd; }
+
+    /* Mermaid container */
+    .mermaid-card {
+      background: var(--bg-card);
+      border: 1px solid #e2e0dc;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(0,0,0,.05), 0 1px 3px rgba(0,0,0,.04);
+      padding: 2rem 1.5rem;
+      overflow-x: auto;
+    }
+    .mermaid { width: 100%; }
+    .mermaid svg { max-width: 100%; height: auto; }
+
+    /* Legend cards */
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-size: .85rem;
+      font-weight: 500;
+      background: var(--bg-card);
+      border: 1px solid #e5e5e5;
+    }
+    .legend-swatch {
+      width: 28px;
+      height: 18px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+
+    /* Pain section */
+    .pain-card {
+      background: linear-gradient(135deg, #fef2f2 0%, #fff1f2 100%);
+      border-left: 5px solid var(--accent-red);
+      border-radius: 0 12px 12px 0;
+      padding: 1.4rem 1.6rem;
+    }
+    .pain-card h4 {
+      color: var(--accent-red);
+      font-weight: 700;
+      margin-bottom: .5rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Section headers */
+    .section-title {
+      font-family: 'M PLUS 1', sans-serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--ink-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 1rem;
+    }
+    .section-title .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    /* Insight card */
+    .insight-card {
+      background: var(--bg-card);
+      border: 1px solid #e2e0dc;
+      border-radius: 12px;
+      padding: 1.4rem 1.6rem;
+    }
+
+    /* Footer */
+    .footer-note {
+      font-size: .75rem;
+      color: var(--ink-muted);
+      text-align: center;
+      padding: 1.5rem 1rem;
+      border-top: 1px solid #e5e5e5;
+    }
+
+    @media (max-width: 768px) {
+      .header-bar { padding: 1.5rem 1rem 1.2rem; }
+      .mermaid-card { padding: 1rem .5rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="content-wrapper">
+
+    <!-- ===== HEADER ===== -->
+    <header class="header-bar">
+      <div class="deco-circle" style="width:260px;height:260px;top:-80px;right:-40px;"></div>
+      <div class="deco-circle" style="width:140px;height:140px;bottom:-50px;left:10%;"></div>
+      <div style="max-width:960px;margin:0 auto;position:relative;">
+        <p style="font-size:.8rem;letter-spacing:.15em;opacity:.55;margin-bottom:.4rem;font-weight:400;">総務課（医局事務員）─ 業務フロー分析</p>
+        <h1 style="font-family:'M PLUS 1',sans-serif;font-size:1.7rem;font-weight:800;letter-spacing:.02em;line-height:1.4;">
+          外科系日直・宿直当番表作成
+        </h1>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:.8rem;">
+          <span class="badge badge-freq">📅 月1回</span>
+          <span class="badge badge-time">⏱ 2〜3時間（場合によりそれ以上）</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- ===== MAIN ===== -->
+    <main style="max-width:1040px;margin:0 auto;padding:2rem 1.2rem 1rem;">
+
+      <!-- Mermaid Diagram -->
+      <div class="mermaid-card">
+        <pre class="mermaid">
+flowchart TD
+
+  %% ── Class Definitions ──
+  classDef default fill:#fff,stroke:#333,stroke-width:1px
+  classDef actor fill:#e0e7ff,stroke:#4338ca,stroke-width:2px
+  classDef system fill:#d1fae5,stroke:#059669,stroke-width:1px
+  classDef physical fill:#fef3c7,stroke:#d97706,stroke-width:1px,stroke-dasharray: 5 5
+  classDef pain fill:#fee2e2,stroke:#ef4444,stroke-width:4px,color:#b91c1c
+
+  %% ── Start ──
+  START([🗓 毎月20日頃&lt;br/&gt;不可日表に全員記入完了]):::actor
+
+  %% ========== Physical Lane ==========
+  subgraph PHYSICAL ["🏢 Physical ── 物理・アナログ"]
+    direction TB
+    P1["📋 不可日表を確認"]:::physical
+    P2["🗣 未記入の医師に&lt;br/&gt;直接声かけ"]:::physical
+    P3["👥 別の人にダブルチェックを依頼"]:::physical
+  end
+
+  %% ========== Human Lane ==========
+  subgraph HUMAN ["🧠 Human ── 担当者の判断・作業"]
+    direction TB
+    H1["🔍 未記入者がいるか確認"]:::actor
+    H2["✏️ 個人別に不可日へ&lt;br/&gt;×を入力"]:::actor
+    H3{"🤔 思考：役職別ルール&lt;br/&gt;部長・副部長＝平日1回&lt;br/&gt;一般医師＝平日1＋土日祝1"}:::actor
+    H4["📐 制約を守りながら&lt;br/&gt;当番を組んでいく"]:::pain
+    H5{"💭 思考：外来前日・&lt;br/&gt;手術前日は避ける？&lt;br/&gt;不可日にしていない人も&lt;br/&gt;配慮するか判断"}:::actor
+    H6["⚖️ 月により基本回数で&lt;br/&gt;埋まらない場合&lt;br/&gt;負担の偏りを記録・調整"]:::pain
+    H7["✅ チェック：&lt;br/&gt;×日に入れていないか&lt;br/&gt;週2回以上になっていないか"]:::actor
+  end
+
+  %% ========== System Lane ==========
+  subgraph SYSTEM ["🖥 System ── システム・ツール"]
+    direction TB
+    S1["📊 名簿連動エクセル表を開く"]:::system
+    S2["📝 エクセル上で&lt;br/&gt;当番割り当てを入力"]:::system
+    S3["📑 完成した当番表を出力"]:::system
+  end
+
+  %% ── End ──
+  DONE([✅ 当番表 完成&lt;br/&gt;25日頃までに提出]):::actor
+
+  %% ========== Flow Connections ==========
+  START --> P1
+  P1 --> H1
+  H1 -->|未記入あり| P2
+  P2 --> H1
+  H1 -->|全員記入済み| S1
+  S1 --> H2
+  H2 --> S2
+  S2 --> H3
+  H3 --> H5
+  H5 --> H4
+  H4 --> H6
+  H6 --> P3
+  P3 --> H7
+  H7 -->|問題あり| H4
+  H7 -->|問題なし| S3
+  S3 --> DONE
+        </pre>
+      </div>
+
+      <!-- ===== LEGEND ===== -->
+      <section style="margin-top:2rem;">
+        <div class="section-title">
+          <span class="dot" style="background:var(--ink-secondary);"></span>
+          図の見方（凡例）
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;">
+          <div class="legend-item">
+            <div class="legend-swatch" style="background:#fef3c7;border:2px dashed #d97706;"></div>
+            <span>Physical（物理・アナログ）</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-swatch" style="background:#e0e7ff;border:2px solid #4338ca;"></div>
+            <span>Human（担当者の判断）</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-swatch" style="background:#d1fae5;border:2px solid #059669;"></div>
+            <span>System（Excel等ツール）</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-swatch" style="background:#fee2e2;border:3px solid #ef4444;"></div>
+            <span style="color:#b91c1c;font-weight:600;">しんどいポイント（課題）</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-swatch" style="background:#e0e7ff;border:2px solid #4338ca;border-radius:50%;width:22px;height:22px;"></div>
+            <span>ひし形＝判断・思考ポイント</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== PAIN POINTS ===== -->
+      <section style="margin-top:2rem;">
+        <div class="section-title">
+          <span class="dot" style="background:var(--accent-red);"></span>
+          しんどいポイントの解説
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+
+          <div class="pain-card">
+            <h4>🔴 制約条件が多く、パズルのような割り当て作業</h4>
+            <p style="font-size:.88rem;color:#4a4a68;line-height:1.7;">
+              「1週間に2回入ってはいけない」「同じ診療科が連続しない方がよい」「外来前日・手術前日は避ける」「役職によって回数が異なる」「不可日は個人ごとに異なる」──
+              これら<strong>ハードな絶対条件</strong>と<strong>ソフトな配慮条件</strong>が混在する中で、破綻なく1か月分を組み上げる必要があります。
+              唯一の正解がなく、毎回ゼロから試行錯誤するため、2〜3時間以上かかる原因になっています。
+            </p>
+          </div>
+
+          <div class="pain-card">
+            <h4>🔴 負担の偏り調整が属人的</h4>
+            <p style="font-size:.88rem;color:#4a4a68;line-height:1.7;">
+              基本回数で埋まらない月は追加で割り当てが必要になりますが、「誰が多めに入っているか」を過去の記録と照合しながら手動で均す作業は、
+              担当者の記憶と経験に依存しています。引き継ぎが難しく、担当者が変わると品質が不安定になるリスクがあります。
+            </p>
+          </div>
+
+          <div class="pain-card">
+            <h4>🔴 AI活用を試みたが断念</h4>
+            <p style="font-size:.88rem;color:#4a4a68;line-height:1.7;">
+              ChatGPTで自動化を試みたものの、エクセルの不可日表をそのまま読み取らせるだけで精度が落ち、
+              テキストで1人ずつ条件を羅列する手間は「自分で組んだ方が早い」と感じるほどでした。
+              <strong>入力データの整形コスト</strong>と<strong>複合条件の伝達の難しさ</strong>が壁になっています。
+            </p>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ===== IMPROVEMENT HINTS ===== -->
+      <section style="margin-top:2rem;">
+        <div class="section-title">
+          <span class="dot" style="background:var(--accent-blue);"></span>
+          改善のヒント
+        </div>
+        <div class="insight-card">
+          <ul style="list-style:none;padding:0;display:flex;flex-direction:column;gap:12px;font-size:.88rem;color:var(--ink-secondary);line-height:1.7;">
+            <li style="display:flex;gap:8px;">
+              <span style="flex-shrink:0;">💡</span>
+              <span><strong>制約充足ソルバーの導入</strong> ─ 当番割り当ては典型的な「制約充足問題（CSP）」です。Google OR-Tools や Python の constraint ライブラリを使えば、不可日・回数上限・連続禁止などをルールとして定義し、自動で実行可能な解を探索できます。</span>
+            </li>
+            <li style="display:flex;gap:8px;">
+              <span style="flex-shrink:0;">💡</span>
+              <span><strong>入力フォームの標準化</strong> ─ 不可日を Google Forms や Web フォームで収集し、構造化データとして自動取り込みすることで、「声かけ→手入力」の工程を削減できます。</span>
+            </li>
+            <li style="display:flex;gap:8px;">
+              <span style="flex-shrink:0;">💡</span>
+              <span><strong>公平性の可視化</strong> ─ 過去の当番回数をダッシュボード化し、偏りを数値で把握できるようにすると、属人的な調整が不要になります。</span>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer-note">
+      業務フロー分析レポート ─ 外科系日直・宿直当番表作成 ─ Generated for 総務課（医局事務員）
+    </footer>
+
+  </div>
+</body>
+</html>

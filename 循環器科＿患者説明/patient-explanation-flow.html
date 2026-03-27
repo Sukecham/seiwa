@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>業務フロー分析 — 患者説明</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+JP:wght@400;500;600&display=swap" rel="stylesheet" />
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#e0e7ff',
+        primaryBorderColor: '#4338ca',
+        lineColor: '#64748b',
+        fontSize: '14px',
+        fontFamily: '"Noto Sans JP", sans-serif'
+      },
+      flowchart: {
+        htmlLabels: true,
+        curve: 'basis',
+        rankSpacing: 60,
+        nodeSpacing: 40,
+        padding: 16
+      }
+    });
+  </script>
+  <style>
+    :root {
+      --bg-primary: #f8fafc;
+      --bg-card: #ffffff;
+      --accent-indigo: #4338ca;
+      --accent-red: #dc2626;
+      --accent-emerald: #059669;
+      --accent-amber: #d97706;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Noto Sans JP', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+    }
+
+    /* Subtle grid background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(99,102,241,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(99,102,241,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, #312e81 0%, #4338ca 50%, #6366f1 100%);
+      border-radius: 20px;
+      padding: 2.5rem 2.5rem 2rem;
+      color: #fff;
+      margin-bottom: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .header::after {
+      content: '';
+      position: absolute;
+      top: -40%;
+      right: -10%;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+    .header h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      margin-bottom: 0.75rem;
+    }
+    .header .subtitle {
+      font-size: 0.9rem;
+      opacity: 0.8;
+      font-weight: 300;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.35rem 0.85rem;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      backdrop-filter: blur(8px);
+    }
+    .badge-freq { background: rgba(255,255,255,0.18); color: #fff; border: 1px solid rgba(255,255,255,0.25); }
+    .badge-time { background: rgba(255,255,255,0.18); color: #fff; border: 1px solid rgba(255,255,255,0.25); }
+
+    /* Diagram card */
+    .diagram-card {
+      background: var(--bg-card);
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.03);
+    }
+    .diagram-card h2 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .mermaid {
+      display: flex;
+      justify-content: center;
+      overflow-x: auto;
+      padding: 1rem 0;
+    }
+    .mermaid svg { max-width: 100%; height: auto; }
+
+    /* Legend */
+    .legend-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0.75rem;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.6rem 0.9rem;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 400;
+    }
+    .legend-swatch {
+      width: 20px;
+      height: 20px;
+      border-radius: 5px;
+      flex-shrink: 0;
+    }
+    .legend-physical { background: #fef3c7; border: 2px dashed #d97706; }
+    .legend-human { background: #e0e7ff; border: 2px solid #4338ca; }
+    .legend-system { background: #d1fae5; border: 2px solid #059669; }
+    .legend-pain { background: #fee2e2; border: 3px solid #ef4444; }
+
+    /* Pain section */
+    .pain-card {
+      background: linear-gradient(135deg, #fef2f2 0%, #fff1f2 100%);
+      border: 1px solid #fecaca;
+      border-radius: 16px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+    .pain-card h2 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #991b1b;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .pain-detail {
+      background: #fff;
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      border-left: 4px solid #ef4444;
+      font-size: 0.9rem;
+      line-height: 1.8;
+      color: var(--text-secondary);
+    }
+    .pain-detail strong { color: #b91c1c; font-weight: 600; }
+
+    /* Suggestion card */
+    .suggest-card {
+      background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+      border: 1px solid #bbf7d0;
+      border-radius: 16px;
+      padding: 2rem;
+    }
+    .suggest-card h2 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #065f46;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .suggest-item {
+      background: #fff;
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 0.6rem;
+      font-size: 0.88rem;
+      line-height: 1.7;
+      color: var(--text-secondary);
+      border: 1px solid #d1fae5;
+    }
+    .suggest-item:last-child { margin-bottom: 0; }
+
+    .section-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 640px) {
+      .container { padding: 1rem; }
+      .header { padding: 1.5rem; border-radius: 14px; }
+      .header h1 { font-size: 1.35rem; }
+      .diagram-card, .pain-card, .suggest-card { padding: 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- ===== Header ===== -->
+    <header class="header">
+      <div style="position:relative;z-index:1;">
+        <p class="subtitle" style="margin-bottom:0.3rem;">業務フロー分析</p>
+        <h1>🏥 患者説明</h1>
+        <p class="subtitle" style="margin-bottom:1rem;">疾患に対する治療方針の決定・変更・状態変化時に行う患者家族への説明業務</p>
+        <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+          <span class="badge badge-freq">📅 週 1〜2回（患者数により変動）</span>
+          <span class="badge badge-time">⏱ 15分〜1時間</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- ===== Swimlane Diagram ===== -->
+    <div class="diagram-card">
+      <h2>
+        <span class="section-icon" style="background:#e0e7ff;color:#4338ca;">📊</span>
+        スイムレーン図
+      </h2>
+
+      <pre class="mermaid">
+flowchart TD
+
+  subgraph Physical["🟡 Physical ― 物理・アナログ・移動"]
+    direction TB
+    P1["📞 家族と面談日時を調整\n（電話・対面）"]
+    P2["🤝 患者家族と面会\n説明を実施"]
+    P3["❓ 家族からの質問に回答"]
+  end
+
+  subgraph Human["🔵 Human ― 担当者"]
+    direction TB
+    H0{"🔔 きっかけ発生\n治療方針の決定・変更\n状態変化"}
+    H1["📋 患者状態・検査結果を確認"]
+    H2["📚 知識不足時:\nガイドライン・文献を確認"]
+    H3["📅 当日の業務スケジュール確認"]
+    H4["💬 経過・検査・方針を説明"]
+    H5{{"🤔 思考: 想定外の質問\n説明に難渋する場合あり"}}
+    H6{{"🤔 思考: 同意・理解が得られない場合\n次の提案を用意するか？"}}
+    H7["✅ 家族の理解を得て\n方針決定"]
+  end
+
+  subgraph System["🟢 System ― システム・画面"]
+    direction TB
+    S1["🖥 電子カルテで\n患者情報・検査結果を参照"]
+    S2["📝 カルテに説明内容を記載"]:::pain
+  end
+
+  %% Main Flow
+  H0 --> H1
+  H1 --> S1
+  S1 --> H2
+  H2 --> P1
+  P1 --> H3
+  H3 --> P2
+  P2 --> H4
+  H4 --> H5
+  H5 -->|回答できた| P3
+  H5 -->|確認が必要| H2
+  P3 --> H6
+  H6 -->|同意あり| H7
+  H6 -->|同意なし・再提案| H4
+  H7 --> S2
+
+  %% Class Definitions
+  classDef default fill:#fff,stroke:#333,stroke-width:1px
+  classDef actor fill:#e0e7ff,stroke:#4338ca,stroke-width:2px
+  classDef system fill:#d1fae5,stroke:#059669,stroke-width:1px
+  classDef physical fill:#fef3c7,stroke:#d97706,stroke-width:1px,stroke-dasharray:5 5
+  classDef pain fill:#fee2e2,stroke:#ef4444,stroke-width:4px,color:#b91c1c
+
+  %% Apply Classes
+  class P1,P2,P3 physical
+  class H0,H1,H2,H3,H4,H7 actor
+  class H5,H6 actor
+  class S1 system
+  class S2 pain
+      </pre>
+    </div>
+
+    <!-- ===== Legend ===== -->
+    <div class="diagram-card">
+      <h2>
+        <span class="section-icon" style="background:#f1f5f9;color:#475569;">📖</span>
+        図の見方（凡例）
+      </h2>
+      <div class="legend-grid">
+        <div class="legend-item" style="background:#fffbeb;">
+          <div class="legend-swatch legend-physical"></div>
+          <div><strong style="color:#92400e;">Physical</strong><br><span style="font-size:0.8rem;color:#78716c;">物理的な移動・電話・対面行為</span></div>
+        </div>
+        <div class="legend-item" style="background:#eef2ff;">
+          <div class="legend-swatch legend-human"></div>
+          <div><strong style="color:#3730a3;">Human</strong><br><span style="font-size:0.8rem;color:#78716c;">担当者の判断・思考・操作</span></div>
+        </div>
+        <div class="legend-item" style="background:#ecfdf5;">
+          <div class="legend-swatch legend-system"></div>
+          <div><strong style="color:#047857;">System</strong><br><span style="font-size:0.8rem;color:#78716c;">電子カルテ等のシステム操作</span></div>
+        </div>
+        <div class="legend-item" style="background:#fef2f2;">
+          <div class="legend-swatch legend-pain"></div>
+          <div><strong style="color:#991b1b;">課題ポイント</strong><br><span style="font-size:0.8rem;color:#78716c;">ボトルネック・改善対象</span></div>
+        </div>
+      </div>
+      <div style="margin-top:1rem;padding:0.8rem 1rem;background:#f8fafc;border-radius:10px;font-size:0.82rem;color:#64748b;line-height:1.7;">
+        💡 ひし形ノード（🤔 思考）は担当者が迷い・判断に時間を要する箇所を示します。赤枠の太線ノードは【8】で報告された課題箇所です。
+      </div>
+    </div>
+
+    <!-- ===== Pain Point Analysis ===== -->
+    <div class="pain-card">
+      <h2>
+        <span class="section-icon" style="background:#fee2e2;color:#dc2626;">⚠️</span>
+        しんどいポイントの解説
+      </h2>
+      <div class="pain-detail">
+        <strong>課題：「説明と記録が二度手間」</strong><br><br>
+        患者家族への口頭説明（Physicalレーン）を行った後、同じ内容を改めて電子カルテに手入力で記載（Systemレーン）する必要があり、<strong>情報の二重入力</strong>が発生しています。<br><br>
+        これにより以下の問題が生じます：<br><br>
+        <span style="color:#b91c1c;">❶</span> <strong>時間的コスト</strong> ― 説明自体に15分〜1時間を要する上に、記録作業が追加で発生するため、実質的な業務時間が膨らみます。<br>
+        <span style="color:#b91c1c;">❷</span> <strong>記録の正確性リスク</strong> ― 説明から時間が経ってからの記載では、ニュアンスや詳細が抜け落ちる可能性があります。<br>
+        <span style="color:#b91c1c;">❸</span> <strong>心理的負担</strong> ― 同じ内容を二度行うことへの徒労感が、業務全体のモチベーション低下につながります。
+      </div>
+    </div>
+
+    <!-- ===== Improvement Suggestions ===== -->
+    <div class="suggest-card">
+      <h2>
+        <span class="section-icon" style="background:#d1fae5;color:#059669;">💡</span>
+        改善のヒント
+      </h2>
+      <div class="suggest-item">
+        <strong style="color:#065f46;">🎙 音声録音 → 自動文字起こし</strong><br>
+        説明時に同意を得て録音し、音声認識AIで文字起こし → カルテ記載のドラフトを自動生成することで、記録の二重作業を大幅に削減できます。
+      </div>
+      <div class="suggest-item">
+        <strong style="color:#065f46;">📝 説明テンプレートの整備</strong><br>
+        頻出する説明パターン（治療方針変更、状態悪化時など）のテンプレートを電子カルテ上に用意し、説明中にチェック形式で記録を同時進行させる運用も有効です。
+      </div>
+      <div class="suggest-item">
+        <strong style="color:#065f46;">🤖 想定Q&A集の共有ナレッジ化</strong><br>
+        想定外の質問に対する難渋（思考ポイント）を軽減するため、過去の質問と回答をデータベース化し、説明前に参照できる仕組みを構築すると準備時間が短縮されます。
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>

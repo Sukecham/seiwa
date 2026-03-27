@@ -1,0 +1,1515 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>治療方針説明・合意形成プロセス DX設計</title>
+<style>
+:root {
+  --primary: #0d4f6b;
+  --primary-light: #1a7a9e;
+  --secondary: #2e86ab;
+  --accent: #e05263;
+  --accent-warm: #f0a04b;
+  --light: #f4f7f9;
+  --dark: #1c2e3a;
+  --text: #2c3e50;
+  --card-shadow: 0 8px 32px rgba(13,79,107,0.10);
+  --success: #27ae60;
+  --warning: #f39c12;
+  --info: #2e86ab;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: "Hiragino Kaku Gothic Pro", "Meiryo", "Noto Sans JP", sans-serif;
+  line-height: 1.8;
+  background: var(--light);
+  color: var(--text);
+  overflow-x: hidden;
+}
+
+.container {
+  max-width: 1200px;
+  margin: auto;
+  padding: 0 24px;
+}
+
+/* ========== HEADER ========== */
+header {
+  background: linear-gradient(135deg, var(--dark) 0%, var(--primary) 40%, var(--secondary) 100%);
+  color: #fff;
+  padding: 72px 0 100px;
+  text-align: center;
+  clip-path: polygon(0 0, 100% 0, 100% 82%, 0 100%);
+  margin-bottom: 48px;
+  position: relative;
+  overflow: hidden;
+}
+
+header::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at 30% 50%, rgba(255,255,255,0.04) 0%, transparent 50%),
+              radial-gradient(circle at 70% 30%, rgba(46,134,171,0.15) 0%, transparent 40%);
+  pointer-events: none;
+}
+
+header .container { position: relative; z-index: 1; }
+
+.header-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 40px;
+  padding: 8px 20px;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  margin-bottom: 24px;
+  backdrop-filter: blur(4px);
+}
+
+.header-badge svg { width: 16px; height: 16px; fill: var(--accent-warm); }
+
+h1 {
+  font-size: 2.6rem;
+  font-weight: 800;
+  margin-bottom: 16px;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+}
+
+.subtitle {
+  font-size: 1.15rem;
+  opacity: 0.85;
+  max-width: 700px;
+  margin: 0 auto;
+  line-height: 1.7;
+}
+
+/* ========== SECTIONS ========== */
+section {
+  background: #fff;
+  border-radius: 14px;
+  padding: 36px;
+  box-shadow: var(--card-shadow);
+  margin-bottom: 40px;
+  position: relative;
+  overflow: hidden;
+}
+
+section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 5px;
+  height: 100%;
+  background: linear-gradient(180deg, var(--primary), var(--secondary));
+  border-radius: 14px 0 0 14px;
+}
+
+h2 {
+  color: var(--primary);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 20px 0;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--primary);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+h2 .section-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+h2 .section-icon svg { width: 20px; height: 20px; fill: #fff; }
+
+h3 {
+  color: var(--primary);
+  font-size: 1.1rem;
+  margin: 18px 0 10px;
+}
+
+p { margin-bottom: 14px; }
+
+/* ========== INTRO ========== */
+.intro {
+  background: linear-gradient(135deg, #fff 0%, #eef5f9 100%);
+  border: 1px solid rgba(46,134,171,0.15);
+}
+
+.intro::before { background: linear-gradient(180deg, var(--accent), var(--accent-warm)); }
+
+.task-definition {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin: 20px 0;
+}
+
+.task-item {
+  background: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  border: 1px solid rgba(13,79,107,0.1);
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.task-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 4px;
+}
+
+.task-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.task-num {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.redefine-note {
+  background: rgba(240,160,75,0.08);
+  border-left: 4px solid var(--accent-warm);
+  padding: 16px 20px;
+  border-radius: 0 10px 10px 0;
+  margin-top: 16px;
+  font-size: 0.95rem;
+  color: #5a4520;
+}
+
+.redefine-note strong { color: var(--accent); }
+
+/* ========== GRID ========== */
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 28px;
+  margin-bottom: 40px;
+}
+
+/* ========== CARDS ========== */
+.card {
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: var(--card-shadow);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 40px rgba(13,79,107,0.15);
+}
+
+.card-header {
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: #fff;
+  padding: 18px 24px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.card-header.accent-bg {
+  background: linear-gradient(135deg, var(--accent), #c94254);
+}
+
+.card-header.warm-bg {
+  background: linear-gradient(135deg, var(--accent-warm), #d4882e);
+}
+
+.card-header.success-bg {
+  background: linear-gradient(135deg, var(--success), #219a52);
+}
+
+.card-number {
+  position: absolute;
+  top: 50%;
+  right: 20px;
+  transform: translateY(-50%);
+  font-size: 2.8rem;
+  font-weight: 900;
+  opacity: 0.18;
+  line-height: 1;
+}
+
+.card-content {
+  padding: 24px;
+}
+
+.icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.icon svg {
+  width: 22px;
+  height: 22px;
+  fill: #fff;
+}
+
+ul { list-style: none; }
+
+li {
+  margin-bottom: 10px;
+  padding-left: 24px;
+  position: relative;
+  line-height: 1.6;
+}
+
+li::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  background: var(--secondary);
+  border-radius: 50%;
+  position: absolute;
+  left: 0;
+  top: 10px;
+}
+
+.highlight {
+  background: linear-gradient(transparent 55%, rgba(46,134,171,0.2) 45%);
+  font-weight: 700;
+  padding: 0 2px;
+}
+
+.highlight-accent {
+  background: linear-gradient(transparent 55%, rgba(224,82,99,0.2) 45%);
+  font-weight: 700;
+  padding: 0 2px;
+}
+
+.highlight-warm {
+  background: linear-gradient(transparent 55%, rgba(240,160,75,0.25) 45%);
+  font-weight: 700;
+  padding: 0 2px;
+}
+
+/* ========== FLOW TABLE ========== */
+.flow-table-wrap {
+  overflow-x: auto;
+  margin: 20px 0;
+}
+
+.flow-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.92rem;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+
+.flow-table thead th {
+  background: var(--primary);
+  color: #fff;
+  padding: 14px 16px;
+  text-align: left;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.flow-table tbody td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #eef2f5;
+  vertical-align: middle;
+}
+
+.flow-table tbody tr:nth-child(even) { background: #f8fbfd; }
+
+.flow-table tbody tr:hover { background: #edf5fa; }
+
+.step-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--secondary);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.executor-tag {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.executor-human { background: #fde8ea; color: var(--accent); }
+.executor-system { background: #e1f0f8; color: var(--secondary); }
+.executor-physical { background: #fef3e0; color: #b87d2b; }
+
+.bottleneck-row td {
+  background: rgba(224,82,99,0.06) !important;
+  border-left: 3px solid var(--accent);
+}
+
+/* ========== STRESS MAP ========== */
+.stress-map {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+  margin: 20px 0;
+}
+
+.stress-item {
+  padding: 16px 20px;
+  border-radius: 10px;
+  border: 1px solid #e8ecef;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition: 0.2s;
+}
+
+.stress-item:hover { border-color: var(--secondary); }
+
+.stress-step {
+  font-weight: 800;
+  color: var(--primary);
+  font-size: 1.1rem;
+  white-space: nowrap;
+}
+
+.stress-type {
+  font-size: 0.82rem;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-weight: 600;
+}
+
+.stress-think { background: #fde8ea; color: var(--accent); }
+.stress-carry { background: #fef3e0; color: #b87d2b; }
+.stress-retype { background: #e8e0f8; color: #7b5ea7; }
+
+/* ========== ESSENCE BOX ========== */
+.essence-box {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  color: #fff;
+  border-radius: 14px;
+  padding: 32px;
+  margin: 24px 0;
+  text-align: center;
+}
+
+.essence-box h3 { color: #fff; font-size: 1.2rem; margin-bottom: 12px; opacity: 0.85; }
+
+.essence-main {
+  font-size: 1.6rem;
+  font-weight: 800;
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.essence-sub { opacity: 0.8; font-size: 0.95rem; }
+
+.essence-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 16px 0;
+  font-size: 0.95rem;
+  opacity: 0.7;
+}
+
+.essence-arrow svg { width: 20px; height: 20px; fill: #fff; }
+
+/* ========== SOP BADGE ========== */
+.sop-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(46,134,171,0.1);
+  border: 2px solid var(--secondary);
+  border-radius: 10px;
+  padding: 12px 20px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--secondary);
+  margin: 12px 0;
+}
+
+/* ========== SPLIT SECTION ========== */
+.split-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+  margin: 20px 0;
+}
+
+.split-box {
+  padding: 24px;
+  border-radius: 12px;
+  border: 1px solid;
+}
+
+.split-human {
+  background: rgba(46,134,171,0.04);
+  border-color: rgba(46,134,171,0.2);
+}
+
+.split-system {
+  background: rgba(39,174,96,0.04);
+  border-color: rgba(39,174,96,0.2);
+}
+
+.split-title {
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.split-title svg { width: 20px; height: 20px; }
+
+.split-human .split-title { color: var(--secondary); }
+.split-human .split-title svg { fill: var(--secondary); }
+
+.split-system .split-title { color: var(--success); }
+.split-system .split-title svg { fill: var(--success); }
+
+/* ========== AFTER FLOW ========== */
+.after-flow {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  margin: 24px 0;
+  flex-wrap: wrap;
+}
+
+.after-step {
+  flex: 1;
+  min-width: 160px;
+  padding: 20px 16px;
+  text-align: center;
+  position: relative;
+  background: #fff;
+  border: 1px solid #e0e8ee;
+}
+
+.after-step:first-child { border-radius: 12px 0 0 12px; }
+.after-step:last-child { border-radius: 0 12px 12px 0; }
+
+.after-step:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  right: -12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-left: 12px solid #e0e8ee;
+  border-top: 24px solid transparent;
+  border-bottom: 24px solid transparent;
+  z-index: 1;
+}
+
+.after-step-num {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--secondary);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.after-step-text {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.after-step-note {
+  font-size: 0.78rem;
+  color: #888;
+  margin-top: 4px;
+}
+
+/* ========== 6K GRID ========== */
+.six-k-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 24px;
+  margin: 24px 0;
+}
+
+.six-k-card {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #e0e8ee;
+  background: #fff;
+}
+
+.six-k-header {
+  padding: 14px 20px;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.six-k-header svg { width: 20px; height: 20px; fill: #fff; }
+
+.six-k-body { padding: 20px; }
+
+.cost-tier {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f0f3f5;
+}
+
+.cost-tier:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+.cost-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.cost-free { background: #e8f8ee; color: #1a8a44; }
+.cost-existing { background: #e1f0f8; color: var(--secondary); }
+.cost-invest { background: #fde8ea; color: var(--accent); }
+
+.cost-desc { font-size: 0.9rem; line-height: 1.5; }
+
+/* ========== MATRIX TABLE ========== */
+.matrix-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  margin: 20px 0;
+}
+
+.matrix-table thead th {
+  background: var(--primary);
+  color: #fff;
+  padding: 14px 16px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.matrix-table tbody td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #eef2f5;
+  text-align: center;
+}
+
+.matrix-table tbody tr:nth-child(even) { background: #f8fbfd; }
+
+.effect-high { color: var(--success); font-weight: 700; }
+.effect-mid { color: var(--accent-warm); font-weight: 700; }
+
+.difficulty-low { color: var(--success); font-weight: 600; }
+.difficulty-mid { color: var(--accent-warm); font-weight: 600; }
+.difficulty-high { color: var(--accent); font-weight: 600; }
+
+/* ========== FIRST STEP ========== */
+.first-step-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin: 24px 0;
+}
+
+.first-step-card {
+  border-radius: 12px;
+  padding: 28px;
+  border: 2px solid;
+  position: relative;
+  overflow: hidden;
+}
+
+.first-step-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 80px;
+  height: 80px;
+  border-radius: 0 0 0 80px;
+  opacity: 0.08;
+}
+
+.first-step-primary {
+  border-color: var(--secondary);
+  background: rgba(46,134,171,0.03);
+}
+.first-step-primary::before { background: var(--secondary); }
+
+.first-step-secondary {
+  border-color: var(--success);
+  background: rgba(39,174,96,0.03);
+}
+.first-step-secondary::before { background: var(--success); }
+
+.first-step-check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.first-step-check svg { width: 24px; height: 24px; }
+
+.first-step-primary .first-step-check svg { fill: var(--secondary); }
+.first-step-secondary .first-step-check svg { fill: var(--success); }
+
+.first-step-title {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--primary);
+}
+
+.first-step-desc {
+  font-size: 0.92rem;
+  color: #666;
+  margin-top: 8px;
+}
+
+.safe-note {
+  text-align: center;
+  color: #888;
+  font-size: 0.9rem;
+  margin-top: 8px;
+  font-style: italic;
+}
+
+/* ========== CONCLUSION ========== */
+.conclusion {
+  background: linear-gradient(135deg, #fff 0%, #f0f7fb 100%);
+  border: 1px solid rgba(13,79,107,0.1);
+}
+
+.conclusion::before {
+  background: linear-gradient(180deg, var(--accent-warm), var(--accent));
+}
+
+.conclusion-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin: 24px 0;
+}
+
+.conclusion-item {
+  text-align: center;
+  padding: 24px 16px;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+}
+
+.conclusion-label {
+  font-size: 0.8rem;
+  color: #888;
+  margin-bottom: 8px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.conclusion-value {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1.4;
+}
+
+.final-message {
+  text-align: center;
+  margin-top: 28px;
+  padding: 28px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: #fff;
+}
+
+.final-message-main {
+  font-size: 1.3rem;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.final-message-sub { opacity: 0.85; font-size: 0.95rem; }
+
+/* ========== PHASE LABEL ========== */
+.phase-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 20px;
+  letter-spacing: 0.06em;
+  margin-bottom: 8px;
+}
+
+/* ========== KPI ========== */
+.kpi-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin: 16px 0;
+}
+
+.kpi-item {
+  text-align: center;
+  padding: 20px 12px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(46,134,171,0.06), rgba(46,134,171,0.02));
+  border: 1px solid rgba(46,134,171,0.12);
+}
+
+.kpi-icon { margin-bottom: 8px; }
+.kpi-icon svg { width: 28px; height: 28px; fill: var(--secondary); }
+
+.kpi-text { font-weight: 600; font-size: 0.9rem; color: var(--primary); }
+
+/* ========== FOOTER ========== */
+footer {
+  background: var(--dark);
+  color: rgba(255,255,255,0.7);
+  padding: 36px 0;
+  text-align: center;
+  font-size: 0.85rem;
+  margin-top: 20px;
+}
+
+footer strong { color: #fff; }
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 768px) {
+  h1 { font-size: 1.8rem; }
+  header { padding: 48px 0 72px; }
+  .grid-container { grid-template-columns: 1fr; }
+  .task-definition { grid-template-columns: 1fr; }
+  .split-section { grid-template-columns: 1fr; }
+  .six-k-grid { grid-template-columns: 1fr; }
+  .after-flow { flex-direction: column; }
+  .after-step:first-child { border-radius: 12px 12px 0 0; }
+  .after-step:last-child { border-radius: 0 0 12px 12px; }
+  .after-step:not(:last-child)::after { display: none; }
+  .conclusion-grid { grid-template-columns: 1fr; }
+  .first-step-cards { grid-template-columns: 1fr; }
+  .kpi-list { grid-template-columns: 1fr; }
+  section { padding: 24px 20px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ==================== HEADER ==================== -->
+<header>
+  <div class="container">
+    <div class="header-badge">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+      医療DX設計ドキュメント
+    </div>
+    <h1>治療方針説明・合意形成プロセス<br>DX設計書</h1>
+    <div class="subtitle">「情報整理 → 説明 → 合意 → 記録」までを1つのプロセスとして再定義し、<br>医師を「書く人」から「確認する人」へ変革する</div>
+  </div>
+</header>
+
+<div class="container">
+
+<!-- ==================== INTRO ==================== -->
+<section class="intro">
+  <h2>
+    <div class="section-icon">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm-1 7V3.5L18.5 9H13zM6 20V4h5v7h7v9H6z"/></svg>
+    </div>
+    対象業務の定義
+  </h2>
+
+  <div class="task-definition">
+    <div class="task-item">
+      <div class="task-num">①</div>
+      <div>
+        <div class="task-label">提出業務名</div>
+        <div class="task-value">患者説明</div>
+      </div>
+    </div>
+    <div class="task-item">
+      <div class="task-num">②</div>
+      <div>
+        <div class="task-label">DX設計対象名</div>
+        <div class="task-value">治療方針説明・合意形成プロセス</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="redefine-note">
+    <strong>※ 再定義：</strong>単なる「説明行為」ではなく、<span class="highlight">「情報整理 → 説明 → 合意 → 記録」までを1つのプロセス</span>として再定義します。
+  </div>
+</section>
+
+<!-- ==================== PHASE 0 ==================== -->
+<section>
+  <div class="phase-label">PHASE 0</div>
+  <h2>
+    <div class="section-icon">
+      <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    </div>
+    戦略位置づけ確認（変革の前提整理）
+  </h2>
+
+  <h3>■ 組織価値との関係</h3>
+  <p>この業務は以下の組織的価値に直結します：</p>
+
+  <div class="grid-container">
+    <div class="card">
+      <div class="card-header">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></div>
+        <h3>直結する価値</h3>
+      </div>
+      <div class="card-content">
+        <ul>
+          <li><span class="highlight">患者安全</span></li>
+          <li><span class="highlight">医療の質</span></li>
+          <li><span class="highlight">法的リスク管理</span>（説明義務）</li>
+          <li><span class="highlight">患者・家族満足度</span></li>
+          <li><span class="highlight">医師の生産性</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header success-bg">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg></div>
+        <h3>改善で得をする人</h3>
+      </div>
+      <div class="card-content">
+        <ul>
+          <li><span class="highlight">医師</span>（時間・心理負担軽減）</li>
+          <li><span class="highlight">患者家族</span>（理解の質向上）</li>
+          <li><span class="highlight">病院</span>（訴訟リスク低減・記録精度向上）</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header warm-bg">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg></div>
+        <h3>組織政治リスク</h3>
+      </div>
+      <div class="card-content">
+        <ul>
+          <li>「説明は<span class="highlight-accent">医師の専門領域</span>」という意識が強く、標準化に抵抗が出る可能性</li>
+          <li>音声録音などに対する<span class="highlight-accent">プライバシー懸念</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== PHASE 1 ==================== -->
+<section>
+  <div class="phase-label">PHASE 1</div>
+  <h2>
+    <div class="section-icon">
+      <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+    </div>
+    業務の受領と粒度調整
+  </h2>
+
+  <div class="sop-badge">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="var(--secondary)"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+    粒度判定：適切（やや広め）
+  </div>
+
+  <p>説明行為だけでなく<span class="highlight">「準備・調整・記録」まで含んでいる</span>ため、DX対象としてちょうどよい粒度です。</p>
+
+  <div class="redefine-note">
+    <strong>再定義理由：</strong>DX設計は「会話」ではなく<span class="highlight">情報の流れと二重作業の構造に介入</span>するため、前後工程を含めた設計が必要です。
+  </div>
+</section>
+
+<!-- ==================== PHASE 2 ==================== -->
+<section>
+  <div class="phase-label">PHASE 2</div>
+  <h2>
+    <div class="section-icon">
+      <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9h-4v4h-2v-4H9V9h4V5h2v4h4v2z"/></svg>
+    </div>
+    業務フロー再分解（現状可視化）
+  </h2>
+
+  <p>1ステップ＝1判断 or 1行動に分解し、現状プロセスを可視化します。</p>
+
+  <div class="flow-table-wrap">
+    <table class="flow-table">
+      <thead>
+        <tr>
+          <th>Step</th>
+          <th>内容</th>
+          <th>実行主体</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="step-badge">1</span></td>
+          <td>治療方針変更の発生</td>
+          <td><span class="executor-tag executor-human">人</span></td>
+        </tr>
+        <tr>
+          <td><span class="step-badge">2</span></td>
+          <td>患者状態確認</td>
+          <td><span class="executor-tag executor-human">人</span></td>
+        </tr>
+        <tr>
+          <td><span class="step-badge">3</span></td>
+          <td>電子カルテ参照</td>
+          <td><span class="executor-tag executor-system">システム</span></td>
+        </tr>
+        <tr>
+          <td><span class="step-badge">4</span></td>
+          <td>知識不足時に文献確認</td>
+          <td><span class="executor-tag executor-human">人</span></td>
+        </tr>
+        <tr>
+          <td><span class="step-badge">5</span></td>
+          <td>家族と日程調整</td>
+          <td><span class="executor-tag executor-physical">物理</span></td>
+        </tr>
+        <tr>
+          <td><span class="step-badge">6</span></td>
+          <td>当日スケジュール確認</td>
+          <td><span class="executor-tag executor-human">人</span></td>
+        </tr>
+        <tr>
+          <td><span class="step-badge">7</span></td>
+          <td>面談実施</td>
+          <td><span class="executor-tag executor-physical">物理</span></td>
+        </tr>
+        <tr>
+          <td><span class="step-badge">8</span></td>
+          <td>経過・検査・方針説明</td>
+          <td><span class="executor-tag executor-human">人</span></td>
+        </tr>
+        <tr>
+          <td><span class="step-badge">9</span></td>
+          <td>想定外質問対応</td>
+          <td><span class="executor-tag executor-human">人</span></td>
+        </tr>
+        <tr>
+          <td><span class="step-badge">10</span></td>
+          <td>再説明または確認</td>
+          <td><span class="executor-tag executor-human">人</span></td>
+        </tr>
+        <tr>
+          <td><span class="step-badge">11</span></td>
+          <td>合意形成</td>
+          <td><span class="executor-tag executor-human">人</span></td>
+        </tr>
+        <tr class="bottleneck-row">
+          <td><span class="step-badge" style="background:var(--accent)">12</span></td>
+          <td><strong>説明内容をカルテに記載</strong></td>
+          <td><span class="executor-tag executor-system">システム（人入力）</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="grid-container" style="grid-template-columns:repeat(3,1fr);">
+    <div style="text-align:center;padding:16px;background:rgba(46,134,171,0.05);border-radius:10px;">
+      <div style="font-weight:700;color:var(--secondary);margin-bottom:4px;">前半</div>
+      <div style="font-size:0.9rem;">準備フェーズ</div>
+    </div>
+    <div style="text-align:center;padding:16px;background:rgba(240,160,75,0.08);border-radius:10px;">
+      <div style="font-weight:700;color:var(--accent-warm);margin-bottom:4px;">中盤</div>
+      <div style="font-size:0.9rem;">高度判断フェーズ</div>
+    </div>
+    <div style="text-align:center;padding:16px;background:rgba(224,82,99,0.06);border-radius:10px;">
+      <div style="font-weight:700;color:var(--accent);margin-bottom:4px;">後半</div>
+      <div style="font-size:0.9rem;">記録の二重作業フェーズ<br><strong>（ボトルネック）</strong></div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== PHASE 3 ==================== -->
+<section>
+  <div class="phase-label">PHASE 3</div>
+  <h2>
+    <div class="section-icon">
+      <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+    </div>
+    しんどさの構造特定
+  </h2>
+
+  <div class="stress-map">
+    <div class="stress-item">
+      <div class="stress-step">Step 4</div>
+      <span class="stress-type stress-think">迷っている（判断負荷）</span>
+    </div>
+    <div class="stress-item">
+      <div class="stress-step">Step 5</div>
+      <span class="stress-type stress-carry">運んでいる（電話調整）</span>
+    </div>
+    <div class="stress-item">
+      <div class="stress-step">Step 9</div>
+      <span class="stress-type stress-think">迷っている（高度判断）</span>
+    </div>
+    <div class="stress-item">
+      <div class="stress-step">Step 12</div>
+      <span class="stress-type stress-retype">打ち直している（再入力）</span>
+    </div>
+  </div>
+
+  <div class="essence-box">
+    <h3>本質的なしんどさ</h3>
+    <div class="essence-main">① 説明と思考は「高度価値」<br>② 記録は「再入力作業」</div>
+    <div class="essence-arrow">
+      <svg viewBox="0 0 24 24"><path d="M16.01 11H4v2h12.01v3L20 12l-3.99-4z"/></svg>
+    </div>
+    <div class="essence-sub">人がやらなくていいのに人がやっている作業：<strong>Step 12</strong><br>これが疲労の源泉。</div>
+  </div>
+</section>
+
+<!-- ==================== PHASE 4 ==================== -->
+<section>
+  <div class="phase-label">PHASE 4</div>
+  <h2>
+    <div class="section-icon">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+    </div>
+    SOP化可能性判定
+  </h2>
+
+  <div class="sop-badge">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="var(--secondary)"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+    判定：B（条件付きなら型にできる）
+  </div>
+
+  <p>説明の中身は個別性が高いものの、<span class="highlight">「構造」は共通</span>しています。構造SOP（説明の順番・確認項目）の標準化は可能です。</p>
+</section>
+
+<!-- ==================== PHASE 5 ==================== -->
+<section>
+  <div class="phase-label">PHASE 5</div>
+  <h2>
+    <div class="section-icon">
+      <svg viewBox="0 0 24 24"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
+    </div>
+    人の価値と仕組みの分離
+  </h2>
+
+  <div class="split-section">
+    <div class="split-box split-human">
+      <div class="split-title">
+        <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        人が価値を出している部分
+      </div>
+      <ul>
+        <li><span class="highlight">状態解釈</span></li>
+        <li><span class="highlight">リスク説明</span></li>
+        <li><span class="highlight">家族の感情への対応</span></li>
+        <li><span class="highlight">合意形成</span></li>
+      </ul>
+    </div>
+    <div class="split-box split-system">
+      <div class="split-title">
+        <svg viewBox="0 0 24 24"><path d="M20 18c1.1 0 1.99-.9 1.99-2L22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2H0v2h24v-2h-4zM4 6h16v10H4V6z"/></svg>
+        仕組みに任せられる部分
+      </div>
+      <ul>
+        <li>日程調整</li>
+        <li>情報の整理</li>
+        <li>テンプレ構造化</li>
+        <li><span class="highlight-warm">記録下書き作成</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== PHASE 6 ==================== -->
+<section>
+  <div class="phase-label">PHASE 6</div>
+  <h2>
+    <div class="section-icon">
+      <svg viewBox="0 0 24 24"><path d="M9 11.75c-.69 0-1.25.56-1.25 1.25s.56 1.25 1.25 1.25 1.25-.56 1.25-1.25-.56-1.25-1.25-1.25zm6 0c-.69 0-1.25.56-1.25 1.25s.56 1.25 1.25 1.25 1.25-.56 1.25-1.25-.56-1.25-1.25-1.25zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8 0-.29.02-.58.05-.86 2.36-1.05 4.23-2.98 5.21-5.37C11.07 8.33 14.05 10 17.42 10c.78 0 1.53-.09 2.25-.26.21.71.33 1.47.33 2.26 0 4.41-3.59 8-8 8z"/></svg>
+    </div>
+    After設計（楽になる流れ）
+  </h2>
+
+  <div class="after-flow">
+    <div class="after-step">
+      <div class="after-step-num">STEP 1</div>
+      <div class="after-step-text">説明テンプレ<br>自動生成</div>
+      <div class="after-step-note">事前準備</div>
+    </div>
+    <div class="after-step">
+      <div class="after-step-num">STEP 2</div>
+      <div class="after-step-text">説明中<br>音声記録</div>
+      <div class="after-step-note">面談実施</div>
+    </div>
+    <div class="after-step">
+      <div class="after-step-num">STEP 3</div>
+      <div class="after-step-text">カルテ記録ドラフト<br>自動生成</div>
+      <div class="after-step-note">AI処理</div>
+    </div>
+    <div class="after-step">
+      <div class="after-step-num">STEP 4</div>
+      <div class="after-step-text">医師は<br>「確認・修正のみ」</div>
+      <div class="after-step-note">最終チェック</div>
+    </div>
+  </div>
+
+  <div class="essence-box" style="background:linear-gradient(135deg, var(--success), #1a8a44);">
+    <div class="essence-main">実行から確認へ — 役割シフト</div>
+    <div class="essence-sub">医師は「書く人」から「確認する人」へ変わる</div>
+  </div>
+</section>
+
+<!-- ==================== PHASE 7 ==================== -->
+<section>
+  <div class="phase-label">PHASE 7</div>
+  <h2>
+    <div class="section-icon">
+      <svg viewBox="0 0 24 24"><path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/></svg>
+    </div>
+    デジタル介入設計（6K）
+  </h2>
+
+  <div class="six-k-grid">
+    <!-- 1 -->
+    <div class="six-k-card">
+      <div class="six-k-header" style="background:linear-gradient(135deg,#2e86ab,#1a7a9e);">
+        <svg viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg>
+        ❶ データ化する
+      </div>
+      <div class="six-k-body">
+        <div class="cost-tier">
+          <span class="cost-label cost-free">ゼロ円</span>
+          <span class="cost-desc">説明テンプレWord共有</span>
+        </div>
+        <div class="cost-tier">
+          <span class="cost-label cost-existing">既存</span>
+          <span class="cost-desc">音声入力（iPad/PC）</span>
+        </div>
+        <div class="cost-tier">
+          <span class="cost-label cost-invest">投資</span>
+          <span class="cost-desc">音声→カルテ自動連携AI</span>
+        </div>
+      </div>
+    </div>
+    <!-- 2 -->
+    <div class="six-k-card">
+      <div class="six-k-header" style="background:linear-gradient(135deg,#e05263,#c94254);">
+        <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+        ❷ 取り違えない
+      </div>
+      <div class="six-k-body">
+        <div class="cost-tier">
+          <span class="cost-label cost-free">ゼロ円</span>
+          <span class="cost-desc">説明日チェックリスト</span>
+        </div>
+        <div class="cost-tier">
+          <span class="cost-label cost-existing">既存</span>
+          <span class="cost-desc">カルテ必須入力欄設定</span>
+        </div>
+        <div class="cost-tier">
+          <span class="cost-label cost-invest">投資</span>
+          <span class="cost-desc">同意状況アラート機能</span>
+        </div>
+      </div>
+    </div>
+    <!-- 3 -->
+    <div class="six-k-card">
+      <div class="six-k-header" style="background:linear-gradient(135deg,#f0a04b,#d4882e);">
+        <svg viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
+        ❸ つなぎ直す
+      </div>
+      <div class="six-k-body">
+        <div class="cost-tier">
+          <span class="cost-label cost-free">ゼロ円</span>
+          <span class="cost-desc">共通フォルダ</span>
+        </div>
+        <div class="cost-tier">
+          <span class="cost-label cost-existing">既存</span>
+          <span class="cost-desc">カルテテンプレ活用</span>
+        </div>
+        <div class="cost-tier">
+          <span class="cost-label cost-invest">投資</span>
+          <span class="cost-desc">API自動連携</span>
+        </div>
+      </div>
+    </div>
+    <!-- 4 -->
+    <div class="six-k-card">
+      <div class="six-k-header" style="background:linear-gradient(135deg,#27ae60,#219a52);">
+        <svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
+        ❹ 迷わせない
+      </div>
+      <div class="six-k-body">
+        <div class="cost-tier">
+          <span class="cost-label cost-free">ゼロ円</span>
+          <span class="cost-desc">説明順番カード</span>
+        </div>
+        <div class="cost-tier">
+          <span class="cost-label cost-existing">既存</span>
+          <span class="cost-desc">チェック式フォーム</span>
+        </div>
+        <div class="cost-tier">
+          <span class="cost-label cost-invest">投資</span>
+          <span class="cost-desc">条件分岐UI</span>
+        </div>
+      </div>
+    </div>
+    <!-- 5 -->
+    <div class="six-k-card">
+      <div class="six-k-header" style="background:linear-gradient(135deg,#8e44ad,#7b3a96);">
+        <svg viewBox="0 0 24 24"><path d="M19.36 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.64-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
+        ❺ 代わりにやらせる
+      </div>
+      <div class="six-k-body">
+        <div class="cost-tier">
+          <span class="cost-label cost-free">ゼロ円</span>
+          <span class="cost-desc">定型文登録</span>
+        </div>
+        <div class="cost-tier">
+          <span class="cost-label cost-existing">既存</span>
+          <span class="cost-desc">RPA入力補助</span>
+        </div>
+        <div class="cost-tier">
+          <span class="cost-label cost-invest">投資</span>
+          <span class="cost-desc">自動ドラフト生成AI</span>
+        </div>
+      </div>
+    </div>
+    <!-- 6 -->
+    <div class="six-k-card">
+      <div class="six-k-header" style="background:linear-gradient(135deg,#34495e,#2c3e50);">
+        <svg viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-1 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+        ❻ 考えるのを助ける
+      </div>
+      <div class="six-k-body">
+        <div class="cost-tier">
+          <span class="cost-label cost-free">ゼロ円</span>
+          <span class="cost-desc">Q&A共有</span>
+        </div>
+        <div class="cost-tier">
+          <span class="cost-label cost-existing">既存</span>
+          <span class="cost-desc">院内ナレッジDB</span>
+        </div>
+        <div class="cost-tier">
+          <span class="cost-label cost-invest">投資</span>
+          <span class="cost-desc">生成AI過去事例検索</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== PHASE 8 ==================== -->
+<section>
+  <div class="phase-label">PHASE 8</div>
+  <h2>
+    <div class="section-icon">
+      <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+    </div>
+    KPI設計
+  </h2>
+
+  <div class="kpi-list">
+    <div class="kpi-item">
+      <div class="kpi-icon">
+        <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+      </div>
+      <div class="kpi-text">説明後の記録時間</div>
+    </div>
+    <div class="kpi-item">
+      <div class="kpi-icon">
+        <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+      </div>
+      <div class="kpi-text">二重入力回数</div>
+    </div>
+    <div class="kpi-item">
+      <div class="kpi-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+      </div>
+      <div class="kpi-text">医師の心理負担<br>自己評価（5段階）</div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== PHASE 9 ==================== -->
+<section>
+  <div class="phase-label">PHASE 9</div>
+  <h2>
+    <div class="section-icon">
+      <svg viewBox="0 0 24 24"><path d="M11 15h2v2h-2zm0-8h2v6h-2zm.99-5C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/></svg>
+    </div>
+    実装難易度 × 効果マトリクス
+  </h2>
+
+  <table class="matrix-table">
+    <thead>
+      <tr>
+        <th>施策</th>
+        <th>効果</th>
+        <th>難易度</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="text-align:left;font-weight:600;">テンプレ整備</td>
+        <td><span class="effect-mid">中</span></td>
+        <td><span class="difficulty-low">低</span></td>
+      </tr>
+      <tr>
+        <td style="text-align:left;font-weight:600;">音声入力活用</td>
+        <td><span class="effect-high">大</span></td>
+        <td><span class="difficulty-mid">中</span></td>
+      </tr>
+      <tr>
+        <td style="text-align:left;font-weight:600;">自動ドラフトAI</td>
+        <td><span class="effect-high">大</span></td>
+        <td><span class="difficulty-high">高</span></td>
+      </tr>
+      <tr>
+        <td style="text-align:left;font-weight:600;">Q&A共有</td>
+        <td><span class="effect-mid">中</span></td>
+        <td><span class="difficulty-low">低</span></td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ==================== PHASE 10 ==================== -->
+<section>
+  <div class="phase-label">PHASE 10</div>
+  <h2>
+    <div class="section-icon">
+      <svg viewBox="0 0 24 24"><path d="M13.49 5.48c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-3.6 13.9l1-4.4 2.1 2v6h2v-7.5l-2.1-2 .6-3c1.3 1.5 3.3 2.5 5.5 2.5v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1l-5.2 2.2v4.7h2v-3.4l1.8-.7-1.6 8.1-4.9-1-.4 2 7 1.4z"/></svg>
+    </div>
+    最初の一手
+  </h2>
+
+  <div class="first-step-cards">
+    <div class="first-step-card first-step-primary">
+      <div class="first-step-check">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+        <span class="first-step-title">① 説明テンプレ構造の標準化</span>
+      </div>
+      <div class="first-step-desc">→ 今日からできる</div>
+    </div>
+    <div class="first-step-card first-step-secondary">
+      <div class="first-step-check">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+        <span class="first-step-title">② 音声入力で記録下書き</span>
+      </div>
+      <div class="first-step-desc">→ 小規模トライアル</div>
+    </div>
+  </div>
+
+  <p class="safe-note">失敗しても業務停止しない安全な施策です。</p>
+</section>
+
+<!-- ==================== CONCLUSION ==================== -->
+<section class="conclusion">
+  <h2>
+    <div class="section-icon" style="background:linear-gradient(135deg, var(--accent-warm), var(--accent));">
+      <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+    </div>
+    最終まとめ
+  </h2>
+
+  <div class="conclusion-grid">
+    <div class="conclusion-item">
+      <div class="conclusion-label">この業務の本質</div>
+      <div class="conclusion-value">高度な判断と<br>感情対応</div>
+    </div>
+    <div class="conclusion-item">
+      <div class="conclusion-label">しんどさの正体</div>
+      <div class="conclusion-value" style="color:var(--accent);">説明後の<br>二重記録</div>
+    </div>
+    <div class="conclusion-item">
+      <div class="conclusion-label">手を入れるべき場所</div>
+      <div class="conclusion-value">記録工程の<br>自動化・半自動化</div>
+    </div>
+  </div>
+
+  <div class="final-message">
+    <div class="final-message-main">医師は「書く人」から「確認する人」へ変わる</div>
+    <div class="final-message-sub">最初の一歩は「説明テンプレを構造化すること」。そこからDXは自然に広がります。</div>
+  </div>
+</section>
+
+</div>
+
+<!-- ==================== FOOTER ==================== -->
+<footer>
+  <div class="container">
+    <strong>治療方針説明・合意形成プロセス DX設計書</strong><br>
+    対象業務：患者説明 ｜ 設計手法：10フェーズ業務分析＋6Kデジタル介入設計
+  </div>
+</footer>
+
+</body>
+</html>

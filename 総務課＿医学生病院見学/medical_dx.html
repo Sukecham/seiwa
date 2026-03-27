@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>医学生病院見学 受付〜実施完了プロセス DX設計書</title>
+<style>
+:root {
+  --primary: #0d4f6b;
+  --primary-light: #1a7a9e;
+  --secondary: #2e86ab;
+  --accent: #e05a33;
+  --accent-soft: rgba(224,90,51,0.12);
+  --success: #27ae60;
+  --warning: #f39c12;
+  --light: #f4f6f8;
+  --dark: #1e2a35;
+  --text: #2c3e50;
+  --card-shadow: 0 8px 32px rgba(13,79,107,0.10);
+  --hover-shadow: 0 16px 48px rgba(13,79,107,0.18);
+  --border-subtle: rgba(13,79,107,0.08);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: "Hiragino Kaku Gothic Pro","Meiryo","Noto Sans JP",sans-serif;
+  line-height: 1.85;
+  background: var(--light);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+.container { max-width: 1240px; margin: auto; padding: 0 28px; }
+
+/* ===== HEADER ===== */
+header {
+  background: linear-gradient(135deg, var(--dark) 0%, var(--primary) 50%, var(--secondary) 100%);
+  color: #fff;
+  padding: 72px 0 100px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  clip-path: polygon(0 0, 100% 0, 100% 82%, 0 100%);
+  margin-bottom: 48px;
+}
+
+header::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(ellipse at 30% 50%, rgba(46,134,171,0.25) 0%, transparent 60%),
+              radial-gradient(ellipse at 70% 20%, rgba(255,255,255,0.06) 0%, transparent 50%);
+  animation: headerPulse 12s ease-in-out infinite alternate;
+}
+
+@keyframes headerPulse {
+  0% { transform: translate(0,0) scale(1); }
+  100% { transform: translate(-3%,2%) scale(1.05); }
+}
+
+header .container { position: relative; z-index: 1; }
+
+.header-badge {
+  display: inline-block;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 30px;
+  padding: 6px 24px;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  margin-bottom: 20px;
+  backdrop-filter: blur(4px);
+}
+
+h1 {
+  font-size: 2.6rem;
+  font-weight: 800;
+  margin-bottom: 16px;
+  letter-spacing: 0.02em;
+  line-height: 1.3;
+}
+
+.subtitle {
+  font-size: 1.15rem;
+  opacity: 0.88;
+  max-width: 700px;
+  margin: 0 auto;
+  line-height: 1.7;
+}
+
+/* ===== SECTIONS ===== */
+section {
+  background: #fff;
+  border-radius: 14px;
+  padding: 36px 40px;
+  box-shadow: var(--card-shadow);
+  margin-bottom: 44px;
+  border: 1px solid var(--border-subtle);
+  position: relative;
+}
+
+section::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0;
+  width: 5px;
+  height: 100%;
+  background: linear-gradient(180deg, var(--primary), var(--secondary));
+  border-radius: 14px 0 0 14px;
+}
+
+h2 {
+  color: var(--primary);
+  font-size: 1.55rem;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--primary);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+h2 .section-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+h2 .section-icon svg {
+  width: 22px;
+  height: 22px;
+  fill: #fff;
+}
+
+h3 {
+  color: var(--primary-light);
+  margin: 18px 0 10px;
+  font-size: 1.1rem;
+}
+
+p { margin-bottom: 14px; }
+
+/* ===== PHASE LABEL ===== */
+.phase-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: #fff;
+  padding: 6px 18px;
+  border-radius: 24px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  margin-bottom: 14px;
+}
+
+/* ===== GRID ===== */
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 28px;
+  margin-bottom: 44px;
+}
+
+/* ===== CARD ===== */
+.card {
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: var(--card-shadow);
+  transition: transform 0.35s cubic-bezier(.22,1,.36,1), box-shadow 0.35s ease;
+  border: 1px solid var(--border-subtle);
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--hover-shadow);
+}
+
+.card-header {
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: #fff;
+  padding: 18px 24px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  overflow: hidden;
+}
+
+.card-header::after {
+  content: "";
+  position: absolute;
+  top: -20px; right: -20px;
+  width: 80px; height: 80px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 50%;
+}
+
+.card-number {
+  position: absolute;
+  top: 50%;
+  right: 22px;
+  transform: translateY(-50%);
+  font-size: 2.8rem;
+  font-weight: 900;
+  opacity: 0.18;
+  line-height: 1;
+}
+
+.card-content { padding: 22px 24px; }
+
+.icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.icon svg { width: 22px; height: 22px; fill: #fff; }
+
+.icon-sm {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.icon-sm svg { width: 16px; height: 16px; fill: #fff; }
+
+/* ===== LISTS ===== */
+ul { list-style: none; }
+
+li {
+  margin-bottom: 10px;
+  padding-left: 22px;
+  position: relative;
+  line-height: 1.7;
+}
+
+li::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  background: var(--secondary);
+  border-radius: 50%;
+  position: absolute;
+  left: 0;
+  top: 10px;
+}
+
+/* ===== HIGHLIGHT ===== */
+.highlight {
+  background: linear-gradient(transparent 55%, rgba(46,134,171,0.22) 45%);
+  font-weight: 700;
+  padding: 0 2px;
+}
+
+.highlight-accent {
+  background: linear-gradient(transparent 55%, rgba(224,90,51,0.2) 45%);
+  font-weight: 700;
+  padding: 0 2px;
+}
+
+/* ===== FLOW CHART ===== */
+.flow-list {
+  counter-reset: flow-counter;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.flow-item {
+  counter-increment: flow-counter;
+  background: #fff;
+  border-radius: 10px;
+  padding: 16px 20px 16px 60px;
+  position: relative;
+  border: 1px solid rgba(13,79,107,0.1);
+  transition: 0.3s;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+}
+
+.flow-item:hover {
+  border-color: var(--secondary);
+  box-shadow: 0 4px 16px rgba(46,134,171,0.12);
+}
+
+.flow-item::before {
+  content: counter(flow-counter, decimal-leading-zero);
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--secondary);
+  opacity: 0.6;
+}
+
+.flow-tag {
+  display: inline-block;
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-left: 8px;
+  font-weight: 600;
+  vertical-align: middle;
+}
+
+.tag-human { background: rgba(39,174,96,0.12); color: #27ae60; }
+.tag-system { background: rgba(46,134,171,0.12); color: var(--secondary); }
+.tag-wait { background: rgba(243,156,18,0.12); color: #e67e22; }
+.tag-physical { background: rgba(155,89,182,0.12); color: #8e44ad; }
+
+/* ===== PAIN TABLE ===== */
+.pain-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: 16px 0;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+
+.pain-table thead th {
+  background: var(--primary);
+  color: #fff;
+  padding: 14px 18px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.pain-table tbody td {
+  padding: 13px 18px;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  font-size: 0.92rem;
+}
+
+.pain-table tbody tr:nth-child(even) { background: rgba(46,134,171,0.04); }
+.pain-table tbody tr:hover { background: rgba(46,134,171,0.08); }
+
+/* ===== BEFORE/AFTER ===== */
+.comparison-wrap {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 0;
+  align-items: stretch;
+  margin: 20px 0;
+}
+
+.comparison-box {
+  padding: 28px;
+  border-radius: 12px;
+}
+
+.comparison-box.before {
+  background: linear-gradient(135deg, #fdf2f0, #fce4e1);
+  border: 1px solid rgba(224,90,51,0.2);
+}
+
+.comparison-box.after {
+  background: linear-gradient(135deg, #eef9f2, #d5f0e0);
+  border: 1px solid rgba(39,174,96,0.2);
+}
+
+.comparison-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+}
+
+.comparison-arrow svg {
+  width: 36px;
+  height: 36px;
+  fill: var(--secondary);
+}
+
+.comparison-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.comparison-label.label-before { color: var(--accent); }
+.comparison-label.label-after { color: var(--success); }
+
+/* ===== 6K GRID ===== */
+.sixk-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 24px;
+  margin: 20px 0;
+}
+
+.sixk-card {
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid var(--border-subtle);
+  overflow: hidden;
+  transition: 0.3s;
+}
+
+.sixk-card:hover {
+  box-shadow: 0 8px 28px rgba(13,79,107,0.12);
+  transform: translateY(-3px);
+}
+
+.sixk-card-header {
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: #fff;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.sixk-card-header .num {
+  background: rgba(255,255,255,0.2);
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+.sixk-body { padding: 20px; }
+
+.cost-tag {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 12px;
+  margin-right: 6px;
+  margin-bottom: 4px;
+}
+
+.cost-free { background: rgba(39,174,96,0.12); color: #27ae60; }
+.cost-existing { background: rgba(46,134,171,0.12); color: var(--secondary); }
+.cost-invest { background: rgba(224,90,51,0.12); color: var(--accent); }
+
+/* ===== MATRIX TABLE ===== */
+.matrix-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: 16px 0;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+
+.matrix-table thead th {
+  background: var(--primary);
+  color: #fff;
+  padding: 14px 18px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.matrix-table tbody td {
+  padding: 13px 18px;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  text-align: center;
+  font-size: 0.92rem;
+}
+
+.matrix-table tbody td:first-child { text-align: left; font-weight: 600; }
+.matrix-table tbody tr:nth-child(even) { background: rgba(46,134,171,0.04); }
+.matrix-table tbody tr:hover { background: rgba(46,134,171,0.08); }
+
+.badge-high { background: var(--success); color: #fff; padding: 3px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; }
+.badge-mid { background: var(--warning); color: #fff; padding: 3px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; }
+.badge-low { background: var(--secondary); color: #fff; padding: 3px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; }
+
+/* ===== CONCLUSION CALLOUT ===== */
+.conclusion-callout {
+  background: linear-gradient(135deg, var(--dark), var(--primary));
+  color: #fff;
+  border-radius: 14px;
+  padding: 40px 44px;
+  margin-bottom: 44px;
+  position: relative;
+  overflow: hidden;
+}
+
+.conclusion-callout::before {
+  content: "";
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 200px; height: 200px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 50%;
+}
+
+.conclusion-callout::after {
+  content: "";
+  position: absolute;
+  bottom: -60px; left: 30%;
+  width: 300px; height: 300px;
+  background: rgba(46,134,171,0.1);
+  border-radius: 50%;
+}
+
+.conclusion-callout > * { position: relative; z-index: 1; }
+
+.conclusion-callout h2 {
+  color: #fff;
+  border-bottom-color: rgba(255,255,255,0.3);
+}
+
+.conclusion-callout h2 .section-icon {
+  background: rgba(255,255,255,0.15);
+}
+
+.conclusion-callout p { opacity: 0.92; }
+
+.key-message {
+  font-size: 1.35rem;
+  font-weight: 800;
+  margin: 18px 0;
+  line-height: 1.6;
+  color: #fff;
+}
+
+.key-message em {
+  font-style: normal;
+  color: #7dd3fc;
+}
+
+.first-step-box {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 10px;
+  padding: 20px 24px;
+  margin-top: 20px;
+}
+
+.first-step-box h3 {
+  color: #7dd3fc;
+  margin-bottom: 10px;
+}
+
+/* ===== INSIGHT BOX ===== */
+.insight-box {
+  background: var(--accent-soft);
+  border-left: 4px solid var(--accent);
+  border-radius: 0 10px 10px 0;
+  padding: 18px 24px;
+  margin: 18px 0;
+}
+
+.insight-box p { margin-bottom: 0; font-weight: 600; color: var(--accent); }
+
+/* ===== FOOTER ===== */
+footer {
+  background: var(--dark);
+  color: #fff;
+  padding: 36px 0;
+  text-align: center;
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  h1 { font-size: 1.85rem; }
+  header { padding: 48px 0 72px; }
+  section { padding: 24px 20px; }
+  .grid-container { grid-template-columns: 1fr; }
+  .flow-list { grid-template-columns: 1fr; }
+  .sixk-grid { grid-template-columns: 1fr; }
+  .comparison-wrap { grid-template-columns: 1fr; gap: 12px; }
+  .comparison-arrow { transform: rotate(90deg); padding: 8px 0; }
+  .conclusion-callout { padding: 28px 24px; }
+  .key-message { font-size: 1.1rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header>
+  <div class="container">
+    <div class="header-badge">DX業務設計書 ─ 10フェーズ分析</div>
+    <h1>医学生病院見学<br>受付〜実施完了プロセス DX設計</h1>
+    <div class="subtitle">「情報の転記作業」から「判断と関係構築」へ ── 入力を1回にし、人の価値を最大化するための業務変革設計</div>
+  </div>
+</header>
+
+<div class="container">
+
+<!-- ===== フェーズ0 ===== -->
+<section>
+  <div class="phase-label">
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="#fff"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    Phase 0
+  </div>
+  <h2>
+    <span class="section-icon"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></span>
+    戦略位置づけ確認（変革の前提整理）
+  </h2>
+
+  <h3>この業務が関わる組織価値</h3>
+  <ul>
+    <li><span class="highlight">医学生リクルート</span>（将来の採用に直結）</li>
+    <li><span class="highlight">病院ブランド価値</span>の形成</li>
+    <li>医師・院長との<span class="highlight">信頼関係</span></li>
+    <li>スケジュール調整精度（業務影響最小化）</li>
+    <li>事務部門の生産性</li>
+  </ul>
+
+  <div class="grid-container" style="margin-top:24px;">
+    <div class="card">
+      <div class="card-header" style="background:linear-gradient(135deg,#27ae60,#2ecc71);">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg></div>
+        <h3 style="color:#fff;margin:0;">得をする人</h3>
+      </div>
+      <div class="card-content">
+        <ul>
+          <li>事務局担当者 ─ 負荷軽減</li>
+          <li>医師 ─ 調整ミス減少</li>
+          <li>院長 ─ 事前準備の精度向上</li>
+          <li>学生 ─ 返信スピード向上</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header" style="background:linear-gradient(135deg,#e67e22,#f39c12);">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg></div>
+        <h3 style="color:#fff;margin:0;">影響を受ける人</h3>
+      </div>
+      <div class="card-content">
+        <ul>
+          <li>医師スケジュール管理者</li>
+          <li>総務</li>
+          <li>院長秘書機能</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="insight-box">
+    <p>⚠ 組織政治的リスク：「院長確認」は権威構造に直結するため自動化は慎重に。医師スケジュール調整権限の所在が曖昧だと摩擦が起きる。</p>
+  </div>
+</section>
+
+<!-- ===== フェーズ1 ===== -->
+<section>
+  <div class="phase-label">
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="#fff"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+    Phase 1
+  </div>
+  <h2>
+    <span class="section-icon"><svg viewBox="0 0 24 24"><path d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z"/></svg></span>
+    業務の受領と粒度調整
+  </h2>
+  <p><strong>粒度判定：やや大きい</strong> ── 「見学業務」全体では広すぎるため再定義を実施。</p>
+  <p><span class="highlight">受付〜日程確定〜記録・起案完了</span>までを1プロセスとして再定義。</p>
+
+  <h3>なぜ適切か？</h3>
+  <ul>
+    <li>事務局が<span class="highlight">コントロール可能な範囲</span></li>
+    <li><span class="highlight">負荷が集中</span>しているのはこの区間</li>
+    <li>SOP化しやすい構造を持つ</li>
+  </ul>
+</section>
+
+<!-- ===== フェーズ2 ===== -->
+<section>
+  <div class="phase-label">
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="#fff"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>
+    Phase 2
+  </div>
+  <h2>
+    <span class="section-icon"><svg viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg></span>
+    業務フロー再分解（1ステップ＝1判断 or 行動）
+  </h2>
+
+  <div class="flow-list">
+    <div class="flow-item">見学申込メール受信 <span class="flow-tag tag-system">システム</span></div>
+    <div class="flow-item">内容確認 <span class="flow-tag tag-human">人</span></div>
+    <div class="flow-item">受付返信 <span class="flow-tag tag-human">人</span><span class="flow-tag tag-system">システム</span></div>
+    <div class="flow-item">希望診療科へ日程打診 <span class="flow-tag tag-human">人</span></div>
+    <div class="flow-item">可否回答待ち <span class="flow-tag tag-wait">待ち</span></div>
+    <div class="flow-item">日程調整判断 <span class="flow-tag tag-human">人</span></div>
+    <div class="flow-item">学生へ確定メール送信 <span class="flow-tag tag-human">人</span><span class="flow-tag tag-system">システム</span></div>
+    <div class="flow-item">Garoonへ3グループ登録 <span class="flow-tag tag-human">人</span><span class="flow-tag tag-system">システム</span></div>
+    <div class="flow-item">Excel手順書へ入力 <span class="flow-tag tag-human">人</span><span class="flow-tag tag-system">システム</span></div>
+    <div class="flow-item">起案書作成 <span class="flow-tag tag-human">人</span><span class="flow-tag tag-system">システム</span></div>
+    <div class="flow-item">院長へ面談確認 <span class="flow-tag tag-human">人</span></div>
+    <div class="flow-item">見学当日対応 <span class="flow-tag tag-physical">物理</span><span class="flow-tag tag-human">人</span></div>
+    <div class="flow-item">お礼メール送信 <span class="flow-tag tag-human">人</span><span class="flow-tag tag-system">システム</span></div>
+    <div class="flow-item">資料ファイリング <span class="flow-tag tag-physical">物理</span></div>
+  </div>
+</section>
+
+<!-- ===== フェーズ3 ===== -->
+<section>
+  <div class="phase-label">
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="#fff"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+    Phase 3
+  </div>
+  <h2>
+    <span class="section-icon"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg></span>
+    しんどさの構造特定
+  </h2>
+
+  <table class="pain-table">
+    <thead>
+      <tr><th>ステップ</th><th>負荷の種類</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>④ 希望診療科へ日程打診</td><td>迷っている（判断負荷）</td></tr>
+      <tr><td>⑤ 可否回答待ち</td><td>待っている</td></tr>
+      <tr><td>⑧ Garoonへ3グループ登録</td><td>再入力・ミス不安</td></tr>
+      <tr><td>⑨ Excel手順書へ入力</td><td>再入力</td></tr>
+      <tr><td>⑩ 起案書作成</td><td>再入力・文章作成</td></tr>
+      <tr><td>⑭ 資料ファイリング</td><td>物理保管</td></tr>
+    </tbody>
+  </table>
+
+  <div class="insight-box">
+    <p>本質的なしんどさ：情報が分断されている（Garoon／Excel／起案書／メール）→ 同じ情報を3回打っている</p>
+  </div>
+
+  <h3>人がやらなくていい作業</h3>
+  <ul>
+    <li>予定の複数登録</li>
+    <li>転記</li>
+    <li>お礼メール文章作成</li>
+    <li>起案書定型部分</li>
+  </ul>
+</section>
+
+<!-- ===== フェーズ4 & 5 ===== -->
+<div class="grid-container">
+  <div class="card">
+    <div class="card-header">
+      <div class="icon"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L19 8l-9 9z"/></svg></div>
+      <h3 style="color:#fff;margin:0;">Phase 4 ─ SOP化可能性</h3>
+      <div class="card-number">4</div>
+    </div>
+    <div class="card-content">
+      <p><strong style="color:var(--success);font-size:1.15rem;">判定：A（ほぼそのまま型にできる）</strong></p>
+      <ul>
+        <li>判断パターンが限定的</li>
+        <li>イレギュラーが少ない</li>
+        <li>手順の順番が固定</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header" style="background:linear-gradient(135deg,var(--primary-light),var(--secondary));">
+      <div class="icon"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg></div>
+      <h3 style="color:#fff;margin:0;">Phase 5 ─ 人の価値と仕組みの分離</h3>
+      <div class="card-number">5</div>
+    </div>
+    <div class="card-content">
+      <h3 style="color:var(--success);">人が価値を出している部分</h3>
+      <ul>
+        <li><span class="highlight">日程の妥当性判断</span></li>
+        <li><span class="highlight">院長面談の必要性判断</span></li>
+        <li><span class="highlight">当日のホスピタリティ</span></li>
+      </ul>
+      <h3 style="color:var(--secondary);margin-top:16px;">仕組みに任せられる部分</h3>
+      <ul>
+        <li>情報転記</li>
+        <li>定型メール</li>
+        <li>スケジュール登録</li>
+        <li>起案書フォーマット作成</li>
+        <li>アンケート通知</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ===== フェーズ6 ===== -->
+<section>
+  <div class="phase-label">
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="#fff"><path d="M8 5l8 7-8 7z"/></svg>
+    Phase 6
+  </div>
+  <h2>
+    <span class="section-icon"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-4 6h-4v2h4v2l3-3-3-3v2zm-2 4H9v-2H7v2l-3-3 3-3v2h4V7h2v6z"/></svg></span>
+    After設計（楽になる流れ）
+  </h2>
+
+  <div class="comparison-wrap">
+    <div class="comparison-box before">
+      <div class="comparison-label label-before">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+        BEFORE ─ 現状
+      </div>
+      <p style="font-weight:600;color:var(--accent);margin-bottom:8px;">人の仕事 ＝「入力者」</p>
+      <ul>
+        <li>紙＋再入力モデル</li>
+        <li>同じ情報を3回入力</li>
+        <li>分断されたツール群</li>
+        <li>ミス不安が常にある</li>
+      </ul>
+    </div>
+
+    <div class="comparison-arrow">
+      <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+    </div>
+
+    <div class="comparison-box after">
+      <div class="comparison-label label-after">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg>
+        AFTER ─ 目指す状態
+      </div>
+      <p style="font-weight:600;color:var(--success);margin-bottom:8px;">人の仕事 ＝「確認者」</p>
+      <ul>
+        <li><span class="highlight">入力は1回</span>、あとは自動連携</li>
+        <li>申込フォームで情報を自動DB格納</li>
+        <li>ボタン1つでGaroon登録・起案書生成・Excel更新</li>
+        <li>日程判断のみ人が実施</li>
+        <li>お礼メール自動生成（確認後送信）</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ===== フェーズ7 ===== -->
+<section>
+  <div class="phase-label">
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="#fff"><path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/></svg>
+    Phase 7
+  </div>
+  <h2>
+    <span class="section-icon"><svg viewBox="0 0 24 24"><path d="M12 6v3l4-4-4-4v3c-4.42 0-8 3.58-8 8 0 1.57.46 3.03 1.24 4.26L6.7 14.8c-.45-.83-.7-1.79-.7-2.8 0-3.31 2.69-6 6-6zm6.76 1.74L17.3 9.2c.44.84.7 1.79.7 2.8 0 3.31-2.69 6-6 6v-3l-4 4 4 4v-3c4.42 0 8-3.58 8-8 0-1.57-.46-3.03-1.24-4.26z"/></svg></span>
+    デジタル介入設計（6K）
+  </h2>
+
+  <div class="sixk-grid">
+    <!-- 1 -->
+    <div class="sixk-card">
+      <div class="sixk-card-header"><div class="num">1</div>データ化する</div>
+      <div class="sixk-body">
+        <p><span class="cost-tag cost-free">ゼロ円</span>メールテンプレ統一</p>
+        <p><span class="cost-tag cost-existing">既存ツール</span>Googleフォーム化</p>
+        <p><span class="cost-tag cost-invest">投資</span>申込管理クラウド導入</p>
+      </div>
+    </div>
+    <!-- 2 -->
+    <div class="sixk-card">
+      <div class="sixk-card-header"><div class="num">2</div>取り違えない</div>
+      <div class="sixk-body">
+        <p><span class="cost-tag cost-free">ゼロ円</span>必須入力チェック</p>
+        <p><span class="cost-tag cost-existing">既存ツール</span>フォーム入力制限</p>
+        <p><span class="cost-tag cost-invest">投資</span>Garoon API連携</p>
+      </div>
+    </div>
+    <!-- 3 -->
+    <div class="sixk-card">
+      <div class="sixk-card-header"><div class="num">3</div>つなぎ直す</div>
+      <div class="sixk-body">
+        <p><span class="cost-tag cost-free">ゼロ円</span>CSV一括インポート</p>
+        <p><span class="cost-tag cost-existing">既存ツール</span>RPAでGaroon登録</p>
+        <p><span class="cost-tag cost-invest">投資</span>システム連携開発</p>
+      </div>
+    </div>
+    <!-- 4 -->
+    <div class="sixk-card">
+      <div class="sixk-card-header"><div class="num">4</div>迷わせない</div>
+      <div class="sixk-body">
+        <p><span class="cost-tag cost-free">ゼロ円</span>日程調整チェックリスト</p>
+        <p><span class="cost-tag cost-existing">既存ツール</span>条件分岐フォーム</p>
+        <p><span class="cost-tag cost-invest">投資</span>診療科自動空き確認</p>
+      </div>
+    </div>
+    <!-- 5 -->
+    <div class="sixk-card">
+      <div class="sixk-card-header"><div class="num">5</div>代わりにやらせる</div>
+      <div class="sixk-body">
+        <p><span class="cost-tag cost-free">ゼロ円</span>定型文テンプレ</p>
+        <p><span class="cost-tag cost-existing">既存ツール</span>自動メール送信設定</p>
+        <p><span class="cost-tag cost-invest">投資</span>RPA常時稼働</p>
+      </div>
+    </div>
+    <!-- 6 -->
+    <div class="sixk-card">
+      <div class="sixk-card-header"><div class="num">6</div>考えるのを助ける</div>
+      <div class="sixk-body">
+        <p><span class="cost-tag cost-free">ゼロ円</span>ChatGPTで起案下書き</p>
+        <p><span class="cost-tag cost-existing">既存ツール</span>過去見学履歴検索</p>
+        <p><span class="cost-tag cost-invest">投資</span>履歴分析ダッシュボード</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== フェーズ8 ===== -->
+<section>
+  <div class="phase-label">
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="#fff"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+    Phase 8
+  </div>
+  <h2>
+    <span class="section-icon"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg></span>
+    KPI設計
+  </h2>
+
+  <div class="grid-container">
+    <div class="card">
+      <div class="card-header" style="background:linear-gradient(135deg,#2e86ab,#3498db);">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg></div>
+        <h3 style="color:#fff;margin:0;">1件あたり処理時間</h3>
+        <div class="card-number">1</div>
+      </div>
+      <div class="card-content"><p>申込受付から起案完了までの所要時間を計測し、DX前後で比較</p></div>
+    </div>
+    <div class="card">
+      <div class="card-header" style="background:linear-gradient(135deg,#2e86ab,#3498db);">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M12 6v3l4-4-4-4v3c-4.42 0-8 3.58-8 8 0 1.57.46 3.03 1.24 4.26L6.7 14.8c-.45-.83-.7-1.79-.7-2.8 0-3.31 2.69-6 6-6z"/></svg></div>
+        <h3 style="color:#fff;margin:0;">再入力回数</h3>
+        <div class="card-number">2</div>
+      </div>
+      <div class="card-content"><p>同一情報の入力回数を測定。目標は「入力1回」</p></div>
+    </div>
+    <div class="card">
+      <div class="card-header" style="background:linear-gradient(135deg,#2e86ab,#3498db);">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></div>
+        <h3 style="color:#fff;margin:0;">「しんどさ」自己評価</h3>
+        <div class="card-number">3</div>
+      </div>
+      <div class="card-content"><p>担当者による5段階の主観的負荷評価を定期的に収集</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== フェーズ9 ===== -->
+<section>
+  <div class="phase-label">
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="#fff"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
+    Phase 9
+  </div>
+  <h2>
+    <span class="section-icon"><svg viewBox="0 0 24 24"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg></span>
+    実装難易度 × 効果マトリクス
+  </h2>
+
+  <table class="matrix-table">
+    <thead>
+      <tr><th>改善案</th><th>効果</th><th>難易度</th><th>優先度</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>フォーム化</td><td><span class="badge-high">大</span></td><td><span class="badge-low">低</span></td><td style="font-weight:800;color:var(--accent);">★★★</td></tr>
+      <tr><td>テンプレ統一</td><td><span class="badge-mid">中</span></td><td><span class="badge-low">低</span></td><td style="font-weight:800;color:var(--warning);">★★</td></tr>
+      <tr><td>RPA登録</td><td><span class="badge-high">大</span></td><td><span class="badge-mid">中</span></td><td style="font-weight:800;color:var(--warning);">★★</td></tr>
+      <tr><td>API連携</td><td><span class="badge-high">大</span></td><td><span class="badge-high" style="background:var(--accent);">高</span></td><td style="font-weight:800;color:var(--text);">★</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ===== フェーズ10 ===== -->
+<section>
+  <div class="phase-label" style="background:linear-gradient(135deg,var(--accent),#c0392b);">
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="#fff"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+    Phase 10 ─ 最初の一手
+  </div>
+  <h2>
+    <span class="section-icon" style="background:linear-gradient(135deg,var(--accent),#c0392b);"><svg viewBox="0 0 24 24"><path d="M5 13h11.17l-4.88 4.88c-.39.39-.39 1.03 0 1.42.39.39 1.02.39 1.41 0l6.59-6.59c.39-.39.39-1.02 0-1.41l-6.58-6.6c-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41L16.17 11H5c-.55 0-1 .45-1 1s.45 1 1 1z"/></svg></span>
+    最初の一手
+  </h2>
+
+  <div class="grid-container">
+    <div class="card">
+      <div class="card-header" style="background:linear-gradient(135deg,var(--accent),#c0392b);">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M12 2l4 8H8l4-8z"/></svg></div>
+        <h3 style="color:#fff;margin:0;">① 申込フォーム化（最優先）</h3>
+        <div class="card-number">1</div>
+      </div>
+      <div class="card-content">
+        <ul>
+          <li><span class="highlight-accent">効果大</span> ─ 情報入力の起点を一元化</li>
+          <li><span class="highlight-accent">低コスト</span> ─ 既存ツールで実現可能</li>
+          <li><span class="highlight-accent">すぐ試せる</span> ─ 明日からでも開始可能</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header" style="background:linear-gradient(135deg,var(--accent),#c0392b);">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg></div>
+        <h3 style="color:#fff;margin:0;">② 起案書テンプレ＋生成AI下書き</h3>
+        <div class="card-number">2</div>
+      </div>
+      <div class="card-content">
+        <ul>
+          <li><span class="highlight-accent">作業時間削減</span> ─ 定型部分を自動生成</li>
+          <li><span class="highlight-accent">失敗してもリスク小</span> ─ 確認後の修正が容易</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 最終まとめ ===== -->
+<div class="conclusion-callout">
+  <h2>
+    <span class="section-icon"><svg viewBox="0 0 24 24"><path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z"/></svg></span>
+    最終まとめ
+  </h2>
+
+  <div class="key-message">
+    この業務の本質は<em>「情報の転記作業」</em>。<br>
+    しんどさの正体は、同じ情報を複数回入力し、ミスを恐れ、スケジュール登録を多重化していること。
+  </div>
+
+  <p>判断ではなく「入力」に時間を使っている。だからこそ、入力を1回にすることで、人は<span class="highlight" style="background:linear-gradient(transparent 55%,rgba(125,211,252,0.3) 45%);">「判断」と「関係構築」</span>に集中できるようになる。</p>
+
+  <div class="first-step-box">
+    <h3>最初の一歩</h3>
+    <p style="margin-bottom:0;font-size:1.1rem;">まず<strong>フォーム化</strong>。そして<strong>起案書自動下書き</strong>。</p>
+  </div>
+</div>
+
+</div>
+
+<footer>
+  <div class="container">
+    医学生病院見学 受付〜実施完了プロセス DX設計書 ── 提出業務：医学生の病院見学事務局業務
+  </div>
+</footer>
+
+</body>
+</html>

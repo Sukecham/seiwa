@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>業務フロー: 栄養指導業務 (栄養管理部)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ 
+            startOnLoad: true, 
+            theme: 'base',
+            themeVariables: {
+                primaryColor: '#f3f4f6',
+                primaryTextColor: '#1f2937',
+                primaryBorderColor: '#d1d5db',
+                lineColor: '#6b7280',
+                secondaryColor: '#e5e7eb',
+                tertiaryColor: '#f9fafb'
+            }
+        });
+    </script>
+</head>
+<body class="bg-slate-50 text-slate-800 p-4 md:p-8 font-sans antialiased">
+
+    <div class="max-w-6xl mx-auto">
+        <!-- Header Section -->
+        <header class="mb-8 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+            <h1 class="text-2xl md:text-3xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                </svg>
+                業務フロー: 栄養指導 (栄養管理部)
+            </h1>
+            <div class="flex flex-wrap gap-3">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    頻度: 1日8件程度 (1人あたり0~3件/日)
+                </span>
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    時間: 1回1時間程度
+                </span>
+            </div>
+        </header>
+
+        <!-- Swimlane Diagram Section -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 md:p-8 mb-8 overflow-x-auto">
+            <h2 class="text-lg font-bold text-slate-800 mb-6 border-b pb-2">スイムレーン図 (業務フローと課題の可視化)</h2>
+            <div class="mermaid flex justify-center">
+                flowchart TD
+                    classDef default fill:#fff,stroke:#cbd5e1,stroke-width:1px,color:#334155;
+                    classDef actor fill:#e0e7ff,stroke:#4338ca,stroke-width:2px,color:#312e81;
+                    classDef system fill:#d1fae5,stroke:#059669,stroke-width:2px,color:#064e3b;
+                    classDef physical fill:#fef3c7,stroke:#d97706,stroke-width:2px,stroke-dasharray: 5,color:#78350f;
+                    classDef pain fill:#fee2e2,stroke:#ef4444,stroke-width:3px,color:#991b1b;
+
+                    subgraph System [System: システム・画面]
+                        style System fill:#ecfdf5,stroke:#10b981,stroke-width:2px,stroke-dasharray: 5,color:#065f46
+                        T1(["開始: 医師の依頼 / 対象患者選定"]):::system
+                        S1["電子カルテで情報収集<br/>(カルテ記事, 患者情報, 既往歴, 検査結果)"]:::system
+                        S2["電子カルテに算定実施登録"]:::system
+                        S3["電子カルテに指導内容を記録"]:::system
+                        E(["終了: 算定実施・栄養指導記録完了"]):::system
+                    end
+
+                    subgraph Human [Human: 担当者・思考]
+                        style Human fill:#eef2ff,stroke:#4f46e5,stroke-width:2px,stroke-dasharray: 5,color:#3730a3
+                        H1_pain("課題: 特殊な病態の場合、<br/>事前準備に時間がかかる"):::pain
+                        H1["思考: どの資料を使用するか検討"]:::actor
+                        H2["思考: どのように指導するか検討"]:::actor
+                        H3["思考: カルテへ記載の仕方を検討"]:::actor
+                        H3_pain("課題: 指導時間が長くなると、<br/>指導記録が後回しになる"):::pain
+                    end
+
+                    subgraph Physical [Physical: 物理・アナログ・移動]
+                        style Physical fill:#fffbeb,stroke:#d97706,stroke-width:2px,stroke-dasharray: 5,color:#92400e
+                        P1["指導用資料を用意する"]:::physical
+                        P2["患者に対面で栄養指導を実施する"]:::physical
+                    end
+
+                    %% Connections
+                    T1 --> S1
+                    S1 --> H1_pain
+                    H1_pain -.-> H1
+                    H1 --> P1
+                    P1 --> H2
+                    H2 --> P2
+                    P2 --> H3
+                    H3 --> H3_pain
+                    H3_pain -.-> S2
+                    S2 --> S3
+                    S3 --> E
+            </div>
+        </div>
+
+        <!-- Legend and Pain Points Section -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            <!-- Legend -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 col-span-1">
+                <h3 class="text-md font-bold text-slate-800 mb-4 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    図の見方 (凡例)
+                </h3>
+                <ul class="space-y-3 text-sm">
+                    <li class="flex items-center">
+                        <span class="w-6 h-6 rounded border-2 border-[#059669] bg-[#d1fae5] inline-block mr-3"></span>
+                        <span class="text-slate-700 font-medium">System (システム・画面)</span>
+                    </li>
+                    <li class="flex items-center">
+                        <span class="w-6 h-6 rounded border-2 border-[#4338ca] bg-[#e0e7ff] inline-block mr-3"></span>
+                        <span class="text-slate-700 font-medium">Human (担当者の作業・思考)</span>
+                    </li>
+                    <li class="flex items-center">
+                        <span class="w-6 h-6 rounded border-2 border-[#d97706] border-dashed bg-[#fef3c7] inline-block mr-3"></span>
+                        <span class="text-slate-700 font-medium">Physical (物理・対面・移動)</span>
+                    </li>
+                    <li class="flex items-center mt-4 pt-4 border-t border-slate-100">
+                        <span class="w-6 h-6 rounded border-4 border-[#ef4444] bg-[#fee2e2] inline-block mr-3"></span>
+                        <span class="text-red-700 font-bold">Pain (しんどいところ・課題)</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Pain Points Analysis -->
+            <div class="bg-red-50 rounded-2xl shadow-sm border border-red-100 p-6 col-span-1 md:col-span-2">
+                <h3 class="text-md font-bold text-red-800 mb-4 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    しんどいポイント（課題・ボトルネック）の解説
+                </h3>
+                <div class="space-y-4">
+                    <div class="bg-white p-4 rounded-lg border border-red-200">
+                        <h4 class="font-bold text-red-700 text-sm mb-2">1. 事前準備の工数ブレ（属人化・時間圧迫）</h4>
+                        <p class="text-sm text-slate-700 leading-relaxed">
+                            <strong>「特殊な病態の場合、事前準備に時間がかかる」</strong><br>
+                            電子カルテでの情報収集後、患者の病態が複雑だと「どの資料を使うか」「どう指導するか」の思考・準備プロセスが長引きます。これが全体の1時間の枠を圧迫し、後続の業務遅延の根本原因になっています。
+                        </p>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg border border-red-200">
+                        <h4 class="font-bold text-red-700 text-sm mb-2">2. 記録業務の滞留（記憶の揮発・残業要因）</h4>
+                        <p class="text-sm text-slate-700 leading-relaxed">
+                            <strong>「指導時間が長くなると、指導記録が後回しになる」</strong><br>
+                            対面での指導（Physical）が延長すると、本来直後に行うべきシステムへの「算定登録」や「指導記録」が後回し（Humanの課題）になります。これにより、記憶が薄れてからの記録入力の手間増加や、夕方に事務作業が集中するボトルネックが発生しています。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>

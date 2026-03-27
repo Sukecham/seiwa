@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>業務フロー改善分析 - 活動報告書作成</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body { font-family: 'Inter', 'Noto Sans JP', sans-serif; background-color: #f8fafc; }
+        .mermaid { background-color: white; border-radius: 0.5rem; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-5xl mx-auto">
+        <!-- Header -->
+        <header class="mb-8">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h1 class="text-3xl font-bold text-slate-800">業務フロー改善分析</h1>
+                    <p class="text-slate-600 mt-1">【2】業務名：活動報告書（看護師特定行為組織横断的活動件数集計）</p>
+                </div>
+                <div class="flex gap-2">
+                    <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold">月1回</span>
+                    <span class="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-sm font-semibold">所要時間: 1.5h</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Diagram -->
+        <section class="mb-10">
+            <div class="flex items-center gap-2 mb-4">
+                <div class="w-1 h-6 bg-indigo-600 rounded"></div>
+                <h2 class="text-xl font-bold text-slate-800">スイムレーン図（現状分析）</h2>
+            </div>
+            
+            <div class="mermaid">
+flowchart TD
+    classDef default fill:#fff,stroke:#333,stroke-width:1px;
+    classDef actor fill:#e0e7ff,stroke:#4338ca,stroke-width:2px;
+    classDef system fill:#d1fae5,stroke:#059669,stroke-width:1px;
+    classDef physical fill:#fef3c7,stroke:#d97706,stroke-width:1px,stroke-dasharray: 5 5;
+    classDef pain fill:#fee2e2,stroke:#ef4444,stroke-width:4px,color:#b91c1c;
+
+    subgraph Physical [Physical: 物理・アナログ・印刷]
+        direction TB
+        P1([開始: 1か月の活動終了])
+        P2[集計表・記録の印刷]:::pain
+        P3([終了: 集計の完成])
+    end
+
+    subgraph Human [Human: 担当者の判断・入力]
+        direction TB
+        H1[エクセル業務日誌の内容確認]
+        H2[要請・不応需理由の確認]
+        H3[思考：誤記載の再分類判断]:::actor
+        H4[大分類・小分類の判断と入力]:::pain
+        H5[カルテ記載内容の照合確認]
+    end
+
+    subgraph System [System: 電子カルテ・共有フォルダ]
+        direction TB
+        S1[院内共有フォルダ: 業務報告書]:::system
+        S2[別シート: 集計表]:::system
+        S3[電子カルテ: 記録参照]:::system
+    end
+
+    %% Flows
+    P1 --> S1
+    S1 --> H1
+    H1 --> H2
+    H2 --> S2
+    S2 --> H3
+    H3 --> H4
+    H4 --> S3
+    S3 --> H5
+    H5 --> P2
+    P2 --> P3
+
+    %% Applying Pain labels manually to connections where relevant
+    linkStyle 5 stroke:#ef4444,stroke-width:2px;
+    linkStyle 8 stroke:#ef4444,stroke-width:2px;
+            </div>
+        </section>
+
+        <!-- Legend -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-10">
+            <div class="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                <span class="block text-xs font-bold text-blue-800 uppercase">Human</span>
+                <span class="text-sm">担当者の思考・入力</span>
+            </div>
+            <div class="bg-green-50 p-3 rounded-lg border border-green-200">
+                <span class="block text-xs font-bold text-green-800 uppercase">System</span>
+                <span class="text-sm">電子カルテ・Excel等</span>
+            </div>
+            <div class="bg-yellow-50 p-3 rounded-lg border border-yellow-200">
+                <span class="block text-xs font-bold text-yellow-800 uppercase">Physical</span>
+                <span class="text-sm">印刷・物理的移動</span>
+            </div>
+            <div class="bg-red-50 p-3 rounded-lg border border-red-200">
+                <span class="block text-xs font-bold text-red-800 uppercase">Pain point</span>
+                <span class="text-sm font-bold text-red-700">改善が必要な工程</span>
+            </div>
+        </div>
+
+        <!-- Analysis Section -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                    </svg>
+                    しんどいポイントの解説
+                </h3>
+                <div class="space-y-4 text-slate-600 leading-relaxed">
+                    <div>
+                        <span class="font-bold text-slate-800 block">1. 「二重管理」による転記のムダ</span>
+                        <p class="text-sm">業務日誌（Excel）から別の集計表（Excel）へデータを移し替える作業が「手作業で面倒」の根源です。データの構造が最初から集計向けになっていないため、人間が橋渡し役になっています。</p>
+                    </div>
+                    <div>
+                        <span class="font-bold text-slate-800 block">2. 表記揺れの修正コスト</span>
+                        <p class="text-sm">「分類と内容が間違っている箇所を分類しなおす」工程は、入力段階でのルール化が不十分であることを示唆しています。後工程での修正は、前工程の数倍の時間がかかります。</p>
+                    </div>
+                    <div>
+                        <span class="font-bold text-slate-800 block">3. 最終工程の「印刷」負荷</span>
+                        <p class="text-sm">全ての行為をカルテで再確認し、印刷する作業は物理的な拘束時間を増やしています。デジタルで完結できないフローが全体の重しとなっています。</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-indigo-50 p-6 rounded-xl shadow-sm border border-indigo-100">
+                <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-500" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                    </svg>
+                    コンサルタントの改善案
+                </h3>
+                <ul class="space-y-3">
+                    <li class="flex gap-3 text-sm">
+                        <span class="text-indigo-600 font-bold">●</span>
+                        <span><strong>入力規則の徹底:</strong> 業務日誌の入力時にプルダウン選択を導入し、後からの「再分類」をゼロにする。</span>
+                    </li>
+                    <li class="flex gap-3 text-sm">
+                        <span class="text-indigo-600 font-bold">●</span>
+                        <span><strong>集計の自動化:</strong> Excelの「パワークエリ」を活用。日誌を特定フォルダに保存するだけで、集計表が自動更新される仕組みへ。</span>
+                    </li>
+                    <li class="flex gap-3 text-sm">
+                        <span class="text-indigo-600 font-bold">●</span>
+                        <span><strong>電子化の推進:</strong> 印刷して確認するフローを、PDF保存や電子カルテ上のフラグ管理に置き換え、ペーパーレス化。</span>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <footer class="mt-12 pt-6 border-t border-slate-200 text-center text-slate-400 text-xs">
+            © 2024 Business Process Optimization Report - Healthcare Division
+        </footer>
+    </div>
+
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'base',
+            themeVariables: {
+                primaryColor: '#ffffff',
+                primaryTextColor: '#1e293b',
+                primaryBorderColor: '#334155',
+                lineColor: '#64748b',
+                secondaryColor: '#f8fafc',
+                tertiaryColor: '#f8fafc'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            }
+        });
+    </script>
+</body>
+</html>

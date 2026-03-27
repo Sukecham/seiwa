@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>業務フロー: 研修医研修レポート提出チェック表作成</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ 
+      startOnLoad: true, 
+      theme: 'base',
+      themeVariables: {
+        fontFamily: 'ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
+      }
+    });
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans p-4 md:p-8">
+
+  <div class="max-w-5xl mx-auto space-y-6">
+    
+    <!-- ヘッダーセクション -->
+    <header class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div>
+        <h1 class="text-2xl font-bold text-slate-900">研修医研修レポート提出チェック表作成</h1>
+        <p class="text-sm text-slate-500 mt-1">総務課 臨床研修担当者 様</p>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <span class="px-3 py-1 bg-blue-50 text-blue-700 border border-blue-200 rounded-full text-sm font-semibold flex items-center gap-1">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+          毎日
+        </span>
+        <span class="px-3 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full text-sm font-semibold flex items-center gap-1">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          30分〜1時間 / 回
+        </span>
+      </div>
+    </header>
+
+    <!-- フローチャートセクション -->
+    <section class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+      <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+        <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+        業務フロー図（スイムレーン）
+      </h2>
+      
+      <div class="overflow-x-auto pb-4">
+        <div class="mermaid min-w-[800px] flex justify-center">
+graph TD
+  %% クラス定義
+  classDef default fill:#fff,stroke:#333,stroke-width:1px;
+  classDef actor fill:#e0e7ff,stroke:#4338ca,stroke-width:2px;
+  classDef system fill:#d1fae5,stroke:#059669,stroke-width:1px;
+  classDef physical fill:#fef3c7,stroke:#d97706,stroke-width:1px,stroke-dasharray: 5 5;
+  classDef pain fill:#fee2e2,stroke:#ef4444,stroke-width:4px,color:#b91c1c;
+
+  subgraph Physical [物理・アナログ・移動]
+    Start((開始:<br>レポート提出)):::physical
+    N2[指導医に<br>レポート提出]:::physical
+    N6[修正済<br>レポート受取]:::physical
+    N7[責任者に<br>二次チェック依頼]:::physical
+    N8[責任者の<br>承認受領]:::physical
+    N11[チェック表を<br>印刷して掲示板へ]:::pain
+    N12[事務棟へ移動し<br>ファイルに収納]:::pain
+    End((終了:<br>ファイルに綴じる)):::physical
+  end
+
+  subgraph Human [担当者]
+    N1[症例チェック＆<br>コメント用紙添付]:::actor
+    N4[一次チェック戻り待ち<br>＆催促]:::pain
+    N5[研修医に修正依頼]:::actor
+  end
+
+  subgraph System [システム・画面]
+    N3[Excelに<br>進捗入力]:::system
+    N10[Garoonの<br>ファイル管理へ格納<br>※毎週月曜]:::system
+  end
+
+  %% フローの結線
+  Start --> N1
+  N1 --> N3
+  N1 --> N2
+  N2 --> N4
+  N4 -->|遅延発生/催促| N5
+  N4 -.->|手元に戻るたび| N3
+  N5 --> N6
+  N6 --> N7
+  N6 -.->|手元に戻るたび| N3
+  N7 --> N8
+  N8 --> N3
+  N8 --> N10
+  N10 --> N11
+  N11 --> N12
+  N12 --> End
+
+  %% サブラックのスタイル
+  style Physical fill:#fffbeb,stroke:#f59e0b,stroke-width:2px,stroke-dasharray: 5 5
+  style Human fill:#eef2ff,stroke:#6366f1,stroke-width:2px
+  style System fill:#ecfdf5,stroke:#10b981,stroke-width:2px
+        </div>
+      </div>
+
+      <!-- 凡例 -->
+      <div class="mt-6 p-4 bg-slate-50 rounded-lg border border-slate-200">
+        <h3 class="text-sm font-bold text-slate-700 mb-3">図の見方（凡例）</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
+          <div class="flex items-center gap-2">
+            <div class="w-6 h-6 bg-[#fffbeb] border-2 border-[#f59e0b] border-dashed rounded flex-shrink-0"></div>
+            <span><b>Physical:</b> 紙、移動、物理的作業</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="w-6 h-6 bg-[#e0e7ff] border-2 border-[#4338ca] rounded flex-shrink-0"></div>
+            <span><b>Human:</b> 担当者の作業、判断</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="w-6 h-6 bg-[#d1fae5] border border-[#059669] rounded flex-shrink-0"></div>
+            <span><b>System:</b> Excel、Garoonの操作</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="w-6 h-6 bg-[#fee2e2] border-4 border-[#ef4444] rounded flex-shrink-0"></div>
+            <span class="text-red-700 font-bold">ボトルネック・しんどい点</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 課題解説セクション -->
+    <section class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+      <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+        <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+        しんどいポイントの解説と改善のヒント
+      </h2>
+      
+      <div class="space-y-4">
+        <!-- ボトルネック1 -->
+        <div class="p-4 border border-red-200 bg-red-50 rounded-lg">
+          <h3 class="font-bold text-red-800 flex items-center gap-2">
+            <span class="bg-red-200 text-red-800 px-2 py-0.5 rounded text-xs">課題 1</span>
+            指導医のチェック遅延と「催促」による心理的負担
+          </h3>
+          <p class="text-sm text-red-900 mt-2 leading-relaxed">
+            <b>現状:</b> 指導医によって一次チェックの返却時間にバラツキがあり、なかなか提出してもらえず催促業務が発生している。<br>
+            <b>ボトルネックの理由:</b> 自身の作業スピードに関わらず、他者のペースで業務が止まる「他者依存」のタスクになっています。また、「催促をする」という行為自体が担当者に精神的ストレスと余計な管理工数（誰が遅れているかの把握）を与えています。
+          </p>
+        </div>
+
+        <!-- ボトルネック2 -->
+        <div class="p-4 border border-red-200 bg-red-50 rounded-lg">
+          <h3 class="font-bold text-red-800 flex items-center gap-2">
+            <span class="bg-red-200 text-red-800 px-2 py-0.5 rounded text-xs">課題 2</span>
+            アナログとデジタルの混在による「二重入力・二度手間」
+          </h3>
+          <p class="text-sm text-red-900 mt-2 leading-relaxed">
+            <b>現状:</b> 毎週月曜日にGaroonへ電子データを格納しているにもかかわらず、全く同じチェック表をわざわざ印刷して物理的な掲示板に貼り出している。<br>
+            <b>ボトルネックの理由:</b> せっかくグループウェア（システム）を使っているのに、ペーパーレス化や情報の一元化が完了していません。情報の共有先が2箇所に分かれることで、作業工数が単純に2倍になってしまっています。
+          </p>
+        </div>
+
+        <!-- ボトルネック3 -->
+        <div class="p-4 border border-red-200 bg-red-50 rounded-lg">
+          <h3 class="font-bold text-red-800 flex items-center gap-2">
+            <span class="bg-red-200 text-red-800 px-2 py-0.5 rounded text-xs">課題 3</span>
+            物理的な「移動」とファイリング工数
+          </h3>
+          <p class="text-sm text-red-900 mt-2 leading-relaxed">
+            <b>現状:</b> 最終的なレポートの保管場所が離れた「事務棟」にあり、ファイリングのためにわざわざ移動しなければならない。<br>
+            <b>ボトルネックの理由:</b> 業務フローの最後に、付加価値を生まない「単なる移動時間」が発生しています。紙ベースでの運用が続く限り、物理的な保管スペースの確保と移動の工数は減らすことができません。
+          </p>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+</body>
+</html>

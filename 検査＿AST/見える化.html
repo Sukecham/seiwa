@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>業務フロー: ASTおよびICTへの提出資料作成</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'base',
+            themeVariables: {
+                primaryColor: '#ffffff',
+                fontFamily: 'sans-serif'
+            }
+        });
+    </script>
+</head>
+<body class="bg-slate-50 text-slate-800 p-4 md:p-8 font-sans antialiased">
+    <div class="max-w-6xl mx-auto space-y-6">
+        
+        <!-- ヘッダーセクション -->
+        <header class="bg-white shadow-sm rounded-xl p-6 md:p-8 border border-slate-200">
+            <div class="flex flex-wrap gap-2 mb-4">
+                <span class="inline-flex items-center bg-indigo-50 text-indigo-700 text-xs font-bold px-3 py-1 rounded-full border border-indigo-200">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    頻度: 週1回 / 月1回
+                </span>
+                <span class="inline-flex items-center bg-indigo-50 text-indigo-700 text-xs font-bold px-3 py-1 rounded-full border border-indigo-200">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    所要時間: 1回 1-2時間
+                </span>
+                <span class="inline-flex items-center bg-slate-100 text-slate-600 text-xs font-bold px-3 py-1 rounded-full border border-slate-200">
+                    中央臨床検査部 細菌検査室
+                </span>
+            </div>
+            <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">ASTおよびICTへの提出資料作成</h1>
+            <p class="text-slate-500 mt-2 text-sm md:text-base">手作業によるデータ加工と確認作業にともなう業務プロセスと課題の可視化</p>
+        </header>
+
+        <!-- スイムレーン図 (Mermaid) -->
+        <section class="bg-white shadow-sm rounded-xl p-6 md:p-8 border border-slate-200 overflow-x-auto">
+            <h2 class="text-xl font-bold mb-4 text-slate-800 border-b border-slate-100 pb-2">業務フロー / スイムレーン図</h2>
+            <div class="mermaid flex justify-center text-sm">
+                graph TD
+                    %% クラス定義
+                    classDef default fill:#fff,stroke:#333,stroke-width:1px;
+                    classDef actor fill:#e0e7ff,stroke:#4338ca,stroke-width:2px;
+                    classDef system fill:#d1fae5,stroke:#059669,stroke-width:1px;
+                    classDef physical fill:#fef3c7,stroke:#d97706,stroke-width:1px,stroke-dasharray: 5 5;
+                    classDef pain fill:#fee2e2,stroke:#ef4444,stroke-width:4px,color:#b91c1c;
+
+                    %% レーン定義
+                    subgraph Physical [Physical レーン : 物理・移動・他部署連携]
+                        start_node([開始: AST用 毎木曜 / ICT用 毎月25日頃]):::physical
+                        get_pt_count[医事課から入院患者数を入手]:::physical
+                        end_node([終了: 感染対策室にExcel提出]):::physical
+                    end
+
+                    subgraph System [System レーン : システム・データ]
+                        db_system[(細菌/検体検査システム)]:::system
+                        db_prev[(前回提出資料データ)]:::system
+                    end
+
+                    subgraph Human [Human レーン : 担当者の作業・思考]
+                        think_deadline{{思考：月末作成時、どこで締めとするか迷う}}:::actor
+                        task_extract[Excelファイルにデータ抽出]:::actor
+                        task_filter[前提出資料を参照し提出済みデータを省く]:::actor
+                        think_blood{{思考：血培2セット陽性/1セット複数菌検出に注意する}}:::actor
+                        task_format[患者毎ソート・セル結合など<br/>決まったフォーマットで資料を作成]:::pain
+                        
+                        loop_cond{上記を5項目について実施<br/>①血培 ②MRSA ③耐性菌<br/>④腸管 ⑤CD}:::actor
+
+                        think_mrsa{{思考：MRSAが持ち込みか病院発生か<br/>オーダー依頼時の情報だけでは分からず迷う}}:::actor
+                        task_mrsa_investigate[MRSAの感染か保菌かを調査]:::pain
+                        task_mrsa_aggregate[病棟毎に患者数・感染患者数を集計]:::actor
+                        task_mrsa_report[MRSA 月集計表の作成]:::pain
+                    end
+
+                    %% サブグラフのスタイル（背景色設定）
+                    style Physical fill:#fef3c7,stroke:#d97706,stroke-width:2px,stroke-dasharray: 5 5,color:#92400e
+                    style System fill:#d1fae5,stroke:#059669,stroke-width:2px,color:#065f46
+                    style Human fill:#e0e7ff,stroke:#4338ca,stroke-width:2px,color:#3730a3
+
+                    %% フローの接続
+                    start_node --> think_deadline
+                    think_deadline --> task_extract
+                    db_system -.->|データ抽出| task_extract
+                    task_extract --> task_filter
+                    db_prev -.->|参照・照合| task_filter
+                    
+                    task_filter --> think_blood
+                    think_blood --> task_format
+                    task_format --> loop_cond
+                    
+                    %% 分岐
+                    loop_cond -->|全項目完了| end_node
+                    loop_cond -->|MRSA項目を実施する際| task_mrsa_investigate
+                    
+                    %% MRSAの処理
+                    task_mrsa_investigate -.-> think_mrsa
+                    get_pt_count --> task_mrsa_aggregate
+                    task_mrsa_investigate --> task_mrsa_aggregate
+                    task_mrsa_aggregate --> task_mrsa_report
+                    task_mrsa_report --> end_node
+            </div>
+        </section>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- 凡例セクション -->
+            <section class="md:col-span-1 bg-white shadow-sm rounded-xl p-6 border border-slate-200">
+                <h3 class="text-lg font-bold mb-4 text-slate-800 border-b border-slate-100 pb-2">図の見方（凡例）</h3>
+                <ul class="space-y-3 text-sm">
+                    <li class="flex items-center">
+                        <div class="w-6 h-4 border-2 border-dashed border-amber-600 bg-amber-100 mr-3"></div>
+                        <span class="text-slate-700"><b>Physical</b>: 物理作業・他部署連携</span>
+                    </li>
+                    <li class="flex items-center">
+                        <div class="w-6 h-4 border-2 border-indigo-700 bg-indigo-100 mr-3"></div>
+                        <span class="text-slate-700"><b>Human</b>: 担当者の作業・思考</span>
+                    </li>
+                    <li class="flex items-center">
+                        <div class="w-6 h-4 border border-emerald-600 bg-emerald-100 mr-3"></div>
+                        <span class="text-slate-700"><b>System</b>: システム・データ</span>
+                    </li>
+                    <li class="flex items-center mt-2 pt-2 border-t border-slate-100">
+                        <div class="w-6 h-4 border-4 border-red-500 bg-red-100 mr-3"></div>
+                        <span class="text-red-700 font-bold">ボトルネック / しんどい箇所</span>
+                    </li>
+                    <li class="flex items-center mt-1">
+                        <div class="px-2 py-0.5 border-2 border-indigo-700 bg-indigo-100 rounded-[10px] text-[10px] mr-3 font-mono">思考</div>
+                        <span class="text-slate-700">判断に迷う・注意が必要な箇所</span>
+                    </li>
+                </ul>
+            </section>
+
+            <!-- 課題・ボトルネック解説セクション -->
+            <section class="md:col-span-2 bg-red-50 shadow-sm rounded-xl p-6 border border-red-200">
+                <h3 class="text-lg font-bold mb-4 text-red-800 flex items-center border-b border-red-200 pb-2">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    しんどいポイントの解説と課題
+                </h3>
+                
+                <div class="space-y-4">
+                    <div class="bg-white p-4 rounded-lg border border-red-100">
+                        <p class="font-bold text-slate-800 mb-1">【ユーザーの声】</p>
+                        <p class="text-slate-600 italic">「日常業務の忙しさに関わらず、提出期限を守るために、資料作成に時間を確保する必要がある。」</p>
+                    </div>
+
+                    <div class="text-slate-700 text-sm leading-relaxed space-y-3">
+                        <p>本業務において「作業時間の確保」が最大の負担となっている理由は、フロー図の赤枠で示した<strong>「手作業によるデータ加工」</strong>と<strong>「情報不足による調査・判断」</strong>にあります。</p>
+                        
+                        <ul class="list-disc pl-5 space-y-2">
+                            <li><strong>手作業のフォーマット整形：</strong>システムから抽出したデータをExcelに移し、前回分との差分目視確認を行った上で、「患者ごとのソート」「セル結合」等の手作業を5つの検査項目すべてで繰り返す必要があり、工数が膨大です。</li>
+                            <li><strong>情報不足による調査負担：</strong>MRSAに関する調査では、「持ち込みか病院発生か」をオーダー依頼時の情報だけで判断できず、カルテの深掘りや感染対策室のシステム等での追加確認を強いられています。</li>
+                            <li><strong>判断の属人化：</strong>「月初会議に向けたデータの締め日」や「血液培養の複雑な検出状況」の精査も担当者の裁量や注意力に依存しており、認知負荷（考えるストレス）を高めています。</li>
+                        </ul>
+
+                        <p class="font-bold text-slate-800 mt-4 border-t border-red-100 pt-3">【コンサルタントからの改善提案メモ】</p>
+                        <p>提出期限が絶対であるため、こうした「予測不可能な判断・調査」と「重い手作業」を期限内に終わらせるプレッシャーが日常業務を圧迫しています。Excelマクロ(VBA)等による<strong>データ整形・差分除外の自動化</strong>や、電子カルテ側での<strong>「持ち込み/発生」フラグの入力標準化</strong>を検討することで、劇的な工数削減が期待できます。</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</body>
+</html>

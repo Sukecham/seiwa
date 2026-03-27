@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>業務フロー可視化：退院・転院に向けた看護要約作成</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ 
+            startOnLoad: true, 
+            theme: 'default',
+            flowchart: { 
+                useMaxWidth: true, 
+                htmlLabels: true, 
+                curve: 'basis',
+                padding: 20
+            }
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: #ffffff;
+            border-radius: 0.5rem;
+            padding: 1rem;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased p-4 md:p-8">
+
+    <div class="max-w-6xl mx-auto bg-white shadow-2xl rounded-2xl overflow-hidden border border-slate-200">
+        
+        <!-- ヘッダーセクション -->
+        <header class="bg-indigo-900 text-white p-6 md:p-8 border-b-4 border-indigo-500">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight">業務フロー：退院・転院に向けた看護要約作成</h1>
+                    <p class="mt-2 text-indigo-200 text-sm md:text-base opacity-90">電子カルテ情報の探索から、作成・確認・MSWへの連絡完了までのプロセス</p>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <span class="bg-indigo-700/50 backdrop-blur-sm border border-indigo-400/30 px-3 py-1 rounded-full text-xs md:text-sm font-semibold shadow-sm">頻度: 日常的・都度発生</span>
+                    <span class="bg-indigo-700/50 backdrop-blur-sm border border-indigo-400/30 px-3 py-1 rounded-full text-xs md:text-sm font-semibold shadow-sm">時間: 大幅な時間消費</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- 図解セクション -->
+        <section class="p-4 md:p-8 bg-white">
+            <h2 class="text-lg font-bold text-slate-700 mb-6 flex items-center">
+                <span class="w-2 h-6 bg-indigo-500 rounded-full mr-3"></span>
+                プロセスマップ
+            </h2>
+            <div class="mermaid flex justify-center w-full overflow-x-auto">
+                graph TD
+                    classDef default fill:#fff,stroke:#333,stroke-width:1px;
+                    classDef actor fill:#f0f4ff,stroke:#4338ca,stroke-width:2px;
+                    classDef system fill:#ecfdf5,stroke:#059669,stroke-width:1px;
+                    classDef physical fill:#fffbeb,stroke:#d97706,stroke-width:1px,stroke-dasharray: 5 5;
+                    classDef pain fill:#fef2f2,stroke:#ef4444,stroke-width:3px,color:#b91c1c;
+
+                    NodeStart((開始:<br>退院・転院の<br>必要性発生 / MSW依頼))
+
+                    subgraph System [System: システム・画面]
+                        direction TB
+                        S1[電子カルテ<br>情報保管]:::system
+                    end
+
+                    subgraph Human [Human: 担当者（看護師・管理者）]
+                        direction TB
+                        H1[①要約が必要な患者を判断]:::actor
+                        H2[思考: 患者抽出で迷う]:::actor
+                        H3[②③転院予定・作成期限を確認]:::actor
+                        H4[④電子カルテから情報を探す]:::actor
+                        H5[思考: どこに何があるか探す]:::actor
+                        H6[思考: 何を記載するか？<br>判断が重い]:::actor
+                        H7[⑤必要情報を整理する]:::actor
+                        H8[⑥看護要約様式に手入力する]:::pain
+                        H9[⑦管理者へ提出]:::actor
+                        H10[思考: 妥当性や抜け漏れは？<br>判断が重い]:::actor
+                        H11[⑧管理者が内容確認する]:::pain
+                        H12{修正が必要か？}:::actor
+                        H13[⑨修正指示を出す]:::pain
+                        H14[⑩スタッフが修正する]:::pain
+                        H15[⑪再度管理者が確認する]:::actor
+                        H16[⑬MSWへ連絡する]:::actor
+                        H17[⑭転院先決定まで<br>追加修正を繰り返す]:::pain
+                    end
+
+                    subgraph Physical [Physical: 物理・アナログ]
+                        direction TB
+                        P1[⑫印鑑を押す]:::physical
+                    end
+
+                    NodeEnd((終了:<br>転院先へ伝達可能な<br>サマリー完成))
+
+                    %% フローの接続
+                    NodeStart --> H1
+                    H1 -.-> H2
+                    H1 --> H3
+                    H3 --> H4
+                    H4 -.-> H5
+                    H4 --> S1
+                    S1 --> H7
+                    H7 -.-> H6
+                    H7 --> H8
+                    H8 --> H9
+                    H9 --> H11
+                    H11 -.-> H10
+                    H11 --> H12
+                    H12 -- Yes --> H13
+                    H13 --> H14
+                    H14 --> H11
+                    H12 -- No --> H15
+                    H15 --> P1
+                    P1 --> H16
+                    H16 --> H17
+                    H17 --> NodeEnd
+            </div>
+        </section>
+
+        <div class="px-8"><hr class="border-slate-100"></div>
+
+        <!-- 解説セクション -->
+        <section class="p-6 md:p-8 grid grid-cols-1 lg:grid-cols-3 gap-8 bg-slate-50/50">
+            
+            <!-- 凡例 -->
+            <div class="col-span-1 bg-white p-6 rounded-xl border border-slate-200 shadow-sm self-start">
+                <h3 class="font-bold text-lg mb-6 text-slate-800 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                    凡例
+                </h3>
+                <ul class="space-y-4 text-sm">
+                    <li class="flex items-center group">
+                        <span class="w-8 h-8 shrink-0 bg-[#f0f4ff] border-2 border-[#4338ca] rounded mr-3 transition-transform group-hover:scale-110"></span> 
+                        <div>
+                            <strong class="block text-slate-900">Human</strong>
+                            <span class="text-slate-500 text-xs">人の作業・思考・判断</span>
+                        </div>
+                    </li>
+                    <li class="flex items-center group">
+                        <span class="w-8 h-8 shrink-0 bg-[#ecfdf5] border border-[#059669] rounded mr-3 transition-transform group-hover:scale-110"></span> 
+                        <div>
+                            <strong class="block text-slate-900">System</strong>
+                            <span class="text-slate-500 text-xs">電子カルテ等のデジタル操作</span>
+                        </div>
+                    </li>
+                    <li class="flex items-center group">
+                        <span class="w-8 h-8 shrink-0 bg-[#fffbeb] border border-[#d97706] border-dashed rounded mr-3 transition-transform group-hover:scale-110"></span> 
+                        <div>
+                            <strong class="block text-slate-900">Physical</strong>
+                            <span class="text-slate-500 text-xs">押印・紙などのアナログ作業</span>
+                        </div>
+                    </li>
+                    <li class="flex items-center group">
+                        <span class="w-8 h-8 shrink-0 bg-[#fef2f2] border-4 border-[#ef4444] rounded mr-3 transition-transform group-hover:scale-110"></span> 
+                        <div>
+                            <strong class="block text-red-700">Pain Point</strong>
+                            <span class="text-slate-500 text-xs font-bold">業務上の課題・高負荷箇所</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 課題解説 -->
+            <div class="col-span-1 lg:col-span-2 bg-red-50/50 p-6 rounded-xl border border-red-100 shadow-sm">
+                <h3 class="font-bold text-lg mb-6 text-red-800 flex items-center">
+                    <svg class="w-6 h-6 mr-2 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    主要な課題（ペインポイント）
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-1 gap-6 text-sm">
+                    <div class="bg-white p-4 rounded-lg border border-red-200 shadow-sm hover:shadow-md transition-shadow">
+                        <h4 class="font-bold text-red-700 flex items-center mb-2">
+                            <span class="bg-red-100 text-red-700 w-5 h-5 rounded-full inline-flex items-center justify-center mr-2 text-xs">1</span>
+                            「再手打ち」による転記コストの肥大
+                        </h4>
+                        <p class="text-slate-600 leading-relaxed pl-7">
+                            すでにシステム内にある情報を「要約」という別枠に手入力しています。これは価値を生まない純粋な「作業」であり、ヒューマンエラーの温床です。
+                        </p>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg border border-red-200 shadow-sm hover:shadow-md transition-shadow">
+                        <h4 class="font-bold text-red-700 flex items-center mb-2">
+                            <span class="bg-red-100 text-red-700 w-5 h-5 rounded-full inline-flex items-center justify-center mr-2 text-xs">2</span>
+                            修正ループと管理者への負荷集中
+                        </h4>
+                        <p class="text-slate-600 leading-relaxed pl-7">
+                            記載ルールが暗黙知化しているため、管理者による差し戻しが頻発。「作成→提出→修正」の往復がスタッフ・管理者双方の時間を奪っています。
+                        </p>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg border border-red-200 shadow-sm hover:shadow-md transition-shadow">
+                        <h4 class="font-bold text-red-700 flex items-center mb-2">
+                            <span class="bg-red-100 text-red-700 w-5 h-5 rounded-full inline-flex items-center justify-center mr-2 text-xs">3</span>
+                            転院待ち期間の「保守」負担
+                        </h4>
+                        <p class="text-slate-600 leading-relaxed pl-7">
+                            転院先が決まるまでの間も患者の状態は変化します。その度に手動で最新化し続ける必要があり、精神的な「やり残し感」が持続します。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+        
+        <!-- フッター -->
+        <footer class="bg-slate-800 p-6 text-center border-t border-slate-700">
+            <div class="flex flex-col md:flex-row justify-center items-center gap-4 text-slate-300">
+                <div class="bg-indigo-600/20 text-indigo-300 px-4 py-2 rounded-lg border border-indigo-500/30">
+                    <p class="text-sm font-medium"><strong>💡 改善の方向性:</strong> 「書く」から「選ぶ・確認する」へ。情報の構造化と自動転記の導入が鍵となります。</p>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+
+</body>
+</html>

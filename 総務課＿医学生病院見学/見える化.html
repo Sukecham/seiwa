@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>業務フロー可視化：医学生病院見学事務局業務</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background-color: #f8fafc;
+        }
+        .mermaid {
+            background: white;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-5xl mx-auto">
+        <!-- Header -->
+        <header class="mb-8 border-b border-gray-200 pb-6">
+            <h1 class="text-3xl font-bold text-gray-800 mb-4">医学生の病院見学事務局業務 フロー分析</h1>
+            <div class="flex flex-wrap gap-3">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                    頻度：週2～3回（繁忙期は毎日）
+                </span>
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
+                    所要時間：5～30分/回
+                </span>
+            </div>
+        </header>
+
+        <!-- Mermaid Diagram -->
+        <div class="mb-12">
+            <div class="mermaid">
+graph TD
+    %% クラス定義
+    classDef default fill:#fff,stroke:#333,stroke-width:1px;
+    classDef actor fill:#e0e7ff,stroke:#4338ca,stroke-width:2px;
+    classDef system fill:#d1fae5,stroke:#059669,stroke-width:1px;
+    classDef physical fill:#fef3c7,stroke:#d97706,stroke-width:1px,stroke-dasharray: 5 5;
+    classDef pain fill:#fee2e2,stroke:#ef4444,stroke-width:4px,color:#b91c1c;
+
+    subgraph Physical [Physical: 物理・アナログ・移動]
+        style Physical fill:#fffbeb,stroke:#d97706,stroke-dasharray: 5 5
+        P1[見学当日の案内]:::physical
+        P2[起案・資料のファイリング]:::physical
+    end
+
+    subgraph Human [Human: 担当者の思考・判断]
+        style Human fill:#f5f3ff,stroke:#4338ca
+        H1[メール内容確認]:::actor
+        H2[日程調整の思考：希望診療科への打診]:::actor
+        H3{思考:日程調整}:::actor
+        H4[院長先生への面談可否確認]:::actor
+    end
+
+    subgraph System [System: システム・ツール]
+        style System fill:#f0fdf4,stroke:#059669
+        S1((病院見学申込メール受信)):::system
+        S2[受付メール・Dr日程伺い返信]:::system
+        S3[学生へ日程確定メール送信]:::system
+        S4[Garoonスケジュール登録<br/>計3グループ分]:::pain
+        S5[Excel手順書へ入力]:::pain
+        S6[病院見学伺い起案作成]:::pain
+        S7[翌日お礼メール・アンケート通知]:::system
+    end
+
+    %% フロー
+    S1 --> H1
+    H1 --> S2
+    S2 --> H2
+    H2 --> H3
+    H3 -- 調整不可の場合 --> S2
+    H3 -- 調整完了 --> S3
+    S3 --> S4
+    S4 --> S5
+    S5 --> S6
+    S6 --> H4
+    H4 --> P1
+    P1 --> S7
+    S7 --> P2
+
+    %% 注釈の配置（見栄えのため）
+    linkStyle 7 stroke:#ef4444,stroke-width:2px;
+            </div>
+        </div>
+
+        <!-- Legend -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">図の見方（凡例）</h2>
+                <ul class="space-y-3 text-sm">
+                    <li class="flex items-center">
+                        <span class="w-4 h-4 bg-[#fef3c7] border border-[#d97706] border-dashed mr-3"></span>
+                        <span><strong>Physical:</strong> 物理的な移動、対面対応、紙の書類管理など</span>
+                    </li>
+                    <li class="flex items-center">
+                        <span class="w-4 h-4 bg-[#e0e7ff] border border-[#4338ca] border-2 mr-3"></span>
+                        <span><strong>Human:</strong> 担当者の判断、メール文章作成、思考プロセス</span>
+                    </li>
+                    <li class="flex items-center">
+                        <span class="w-4 h-4 bg-[#d1fae5] border border-[#059669] mr-3"></span>
+                        <span><strong>System:</strong> PC操作（メール、Excel、Garoon等）</span>
+                    </li>
+                    <li class="flex items-center">
+                        <span class="w-4 h-4 bg-[#fee2e2] border border-[#ef4444] border-4 mr-3"></span>
+                        <span class="text-red-700 font-bold">Pain: 課題・ボトルネック（二度手間や手作業が多い箇所）</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Analysis -->
+            <div class="bg-red-50 p-6 rounded-xl shadow-sm border border-red-100">
+                <h2 class="text-xl font-bold text-red-800 mb-4 font-bold italic">コンサルタントの分析眼</h2>
+                <div class="space-y-4 text-sm text-red-900 leading-relaxed">
+                    <div>
+                        <p class="font-bold">1. 情報の分断（Excel vs 起案書）</p>
+                        <p>「手順書（Excel）」と「起案書」が連動していないため、同じ情報を2回入力する「転記コスト」が発生しています。一箇所の修正が漏れると不整合が起きるリスクがあります。</p>
+                    </div>
+                    <div>
+                        <p class="font-bold">2. スケジュール登録の多重化</p>
+                        <p>Garoonで3つのグループ（院長・総務、午前Dr、午後Dr）に個別に登録する作業は、単純作業ながらミスが許されない高負荷な工程です。見学者が多い時期にはこの作業だけで数十分を費やすボトルネックとなっています。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Recommendation Footer -->
+        <footer class="text-center text-gray-500 text-sm">
+            Created by Swimlane Diagram Generator & Business Consultant
+        </footer>
+    </div>
+
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'base',
+            themeVariables: {
+                primaryColor: '#ffffff',
+                secondaryColor: '#f3f4f6',
+                tertiaryColor: '#f9fafb'
+            }
+        });
+    </script>
+</body>
+</html>
