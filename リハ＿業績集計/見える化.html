@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>業務フロー可視化レポート</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'base',
+            themeVariables: {
+                primaryColor: '#e0e7ff',
+                primaryTextColor: '#1e293b',
+                lineColor: '#64748b',
+                fontSize: '14px'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            }
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 font-sans leading-relaxed">
+
+    <div class="max-w-5xl mx-auto py-10 px-6">
+        <!-- Header Section -->
+        <header class="mb-10 text-center">
+            <h1 class="text-3xl font-bold text-slate-800 mb-4">業務フロー可視化・課題分析</h1>
+            <div class="flex justify-center gap-4 mb-2">
+                <span class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full border border-blue-200">
+                    業務名：リハビリ業績及びその他の業務の集計・確認作業
+                </span>
+            </div>
+            <div class="flex justify-center gap-4">
+                <span class="bg-indigo-50 text-indigo-700 text-xs px-3 py-1 rounded border border-indigo-100">頻度：平日毎日</span>
+                <span class="bg-indigo-50 text-indigo-700 text-xs px-3 py-1 rounded border border-indigo-100">工数：15分/日</span>
+            </div>
+        </header>
+
+        <!-- Main Chart Section -->
+        <main class="bg-white shadow-xl rounded-2xl overflow-hidden mb-10 border border-slate-200">
+            <div class="p-6 bg-slate-800 text-white flex justify-between items-center">
+                <h2 class="text-lg font-semibold tracking-wide">現状の業務スイムレーン図</h2>
+                <span class="text-xs text-slate-400">Mermaid.js Visualizer</span>
+            </div>
+            
+            <div class="p-8 overflow-x-auto">
+                <div class="mermaid">
+graph TD
+    %% クラス定義
+    classDef default fill:#fff,stroke:#333,stroke-width:1px;
+    classDef actor fill:#e0e7ff,stroke:#4338ca,stroke-width:2px;
+    classDef system fill:#d1fae5,stroke:#059669,stroke-width:1px;
+    classDef physical fill:#fef3c7,stroke:#d97706,stroke-width:1px,stroke-dasharray: 5 5;
+    classDef pain fill:#fee2e2,stroke:#ef4444,stroke-width:4px,color:#b91c1c;
+
+    subgraph Physical [Physical: 物理・アナログ・移動]
+        direction TB
+        S3[担当療法士への声かけ]:::pain
+    end
+
+    subgraph Human [Human: 担当者・思考]
+        direction TB
+        Start([開始: リハビリコスト発生])
+        S1H[請求コストと業務時間の集計]:::actor
+        S2[手計算による数値の突合]:::pain
+        S2_Note[思考：不一致の詳細は担当者のみ把握]
+        S5[修正後の再確認]:::pain
+        End([終了: 数値が一致している])
+    end
+
+    subgraph System [System: システム・画面]
+        direction TB
+        S1S[リハビリ請求システム起動]:::system
+        S1E[業績管理Excelの参照]:::system
+        S4[請求システム/Excelの修正入力]:::system
+    end
+
+    %% フロー接続
+    Start --> S1S
+    S1S --> S1E
+    S1E --> S1H
+    S1H --> S2
+    S2 --- S2_Note
+    S2 --> Branch{一致するか?}
+    
+    Branch -- No --> S3
+    S3 --> S4
+    S4 --> S5
+    S5 --> Branch
+    
+    Branch -- Yes --> End
+
+    %% スタイル適用（サブグラフ背景）
+    style Physical fill:#fffbeb,stroke:#f59e0b,stroke-width:1px
+    style Human fill:#f5f3ff,stroke:#8b5cf6,stroke-width:1px
+    style System fill:#f0fdf4,stroke:#22c55e,stroke-width:1px
+                </div>
+            </div>
+        </main>
+
+        <!-- Analysis Section -->
+        <div class="grid md:grid-cols-2 gap-8">
+            <!-- Legend -->
+            <section class="bg-white p-6 rounded-xl shadow border border-slate-200">
+                <h3 class="text-lg font-bold mb-4 border-b pb-2 text-slate-700">図の見方（凡例）</h3>
+                <ul class="space-y-3 text-sm">
+                    <li class="flex items-center gap-3">
+                        <span class="w-4 h-4 rounded border-2 border-red-500 bg-red-100"></span>
+                        <span class="font-bold text-red-700">Pain Point:</span> 心理的・時間的負荷が高い「しんどい」箇所
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <span class="w-4 h-4 rounded border border-indigo-700 bg-indigo-100"></span>
+                        <span class="font-medium text-slate-600">Human:</span> 担当者による判断、思考、手作業
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <span class="w-4 h-4 rounded border border-emerald-600 bg-emerald-100"></span>
+                        <span class="font-medium text-slate-600">System:</span> システムの起動や入力作業
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <span class="w-4 h-4 rounded border border-amber-500 border-dashed bg-amber-50"></span>
+                        <span class="font-medium text-slate-600">Physical:</span> 声かけ、移動などのアナログな介在
+                    </li>
+                </ul>
+            </section>
+
+            <!-- Problem Analysis -->
+            <section class="bg-white p-6 rounded-xl shadow border border-slate-200">
+                <h3 class="text-lg font-bold mb-4 border-b pb-2 text-slate-700">しんどいポイントの解説</h3>
+                <div class="space-y-4">
+                    <div class="bg-red-50 p-3 rounded-lg border-l-4 border-red-500">
+                        <h4 class="font-bold text-red-800 text-sm">1. 「二重管理」による手計算の発生</h4>
+                        <p class="text-xs text-red-700 mt-1">請求システムとExcelの2箇所にデータが分散しているため、人間が「手計算で突合」せざるを得ません。これがミスを誘発し、心理的負担の源泉となっています。</p>
+                    </div>
+                    <div class="bg-red-50 p-3 rounded-lg border-l-4 border-red-500">
+                        <h4 class="font-bold text-red-800 text-sm">2. 「人依存」のコミュニケーションループ</h4>
+                        <p class="text-xs text-red-700 mt-1">不一致の詳細が担当者本人にしかわからないため、必ず「声かけ」が発生します。係長の確認 → 療法士への依頼 → 修正 → 係長の再確認という多重ループが生じています。</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Consultant Recommendations -->
+        <footer class="mt-10 p-6 bg-slate-800 rounded-xl text-white shadow-lg">
+            <h3 class="text-lg font-bold mb-3 flex items-center gap-2 text-indigo-300">
+                <span>💡</span> コンサルタントの視点（改善のヒント）
+            </h3>
+            <p class="text-sm leading-relaxed text-slate-300">
+                この業務の最大の問題は、<strong>「データの転記」と「目視確認」</strong>という、本来システムが得意とする領域を人間が肩代わりしている点です。
+                <br><br>
+                まずは、請求システムのデータをExcelに自動インポートする仕組み、あるいはExcel側の入力規則を強化して不一致をアラート表示する仕組みを導入することで、係長が「探す・迷う」時間をゼロにできる可能性があります。
+            </p>
+        </footer>
+    </div>
+
+</body>
+</html>
