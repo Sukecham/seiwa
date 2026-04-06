@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>服薬指導 ─ 業務フロー分析</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+JP:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-base: #f8f7f4;
+      --ink: #1a1a2e;
+      --accent-red: #dc2626;
+      --accent-blue: #4338ca;
+      --accent-green: #059669;
+      --accent-amber: #d97706;
+      --card-bg: #ffffff;
+      --border-subtle: #e5e2db;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Noto Sans JP', 'IBM Plex Sans JP', sans-serif;
+      background: var(--bg-base);
+      color: var(--ink);
+      line-height: 1.7;
+    }
+
+    /* Mermaid diagram overrides */
+    .mermaid svg {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .mermaid .node rect,
+    .mermaid .node polygon,
+    .mermaid .node circle {
+      rx: 8;
+      ry: 8;
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #c4c0b8; border-radius: 3px; }
+
+    /* Fade-in animation */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up {
+      animation: fadeUp 0.6s ease-out forwards;
+      opacity: 0;
+    }
+    .fade-up:nth-child(2) { animation-delay: 0.1s; }
+    .fade-up:nth-child(3) { animation-delay: 0.2s; }
+    .fade-up:nth-child(4) { animation-delay: 0.3s; }
+
+    /* Pain point pulse */
+    @keyframes pulse-red {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.3); }
+      50% { box-shadow: 0 0 0 8px rgba(220, 38, 38, 0); }
+    }
+    .pain-pulse { animation: pulse-red 2s infinite; }
+
+    /* Diagram container */
+    .diagram-wrap {
+      background: var(--card-bg);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      overflow-x: auto;
+      padding: 2rem;
+    }
+
+    /* Badge styles */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.3rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+    }
+
+    /* Legend swatch */
+    .swatch {
+      width: 18px;
+      height: 18px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body class="min-h-screen">
+
+  <!-- Header -->
+  <header class="border-b border-[var(--border-subtle)] bg-white/70 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white text-lg font-bold shadow-md">💊</div>
+        <div>
+          <h1 class="text-xl font-bold tracking-tight" style="color:var(--ink);">服薬指導</h1>
+          <p class="text-xs text-gray-500 font-medium">薬剤部 ─ 薬剤管理指導業務</p>
+        </div>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <span class="badge bg-indigo-50 text-indigo-700 border border-indigo-200">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          1回 10〜60分
+        </span>
+        <span class="badge bg-amber-50 text-amber-700 border border-amber-200">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          約5件/日・1病棟
+        </span>
+        <span class="badge bg-red-50 text-red-700 border border-red-200">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          症例により大幅変動
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-6xl mx-auto px-6 py-8 space-y-8">
+
+    <!-- Diagram Section -->
+    <section class="fade-up">
+      <div class="flex items-center gap-2 mb-4">
+        <div class="w-1.5 h-6 bg-indigo-600 rounded-full"></div>
+        <h2 class="text-lg font-bold">業務フロー（スイムレーン図）</h2>
+      </div>
+      <div class="diagram-wrap">
+        <div class="mermaid">
+flowchart TD
+
+  subgraph Physical["🏷️ Physical ─ 物理・アナログ・移動"]
+    direction TB
+    P1["📄 紙資料・持参薬の\n実物確認"]
+    P2["🗣️ 患者へ対面で\n服薬指導を実施"]:::pain
+    P3["📋 指導資料の配布\n（薬情・パンフレット）"]
+  end
+
+  subgraph Human["👤 Human ─ 担当者（薬剤師）"]
+    direction TB
+    H0{{"🔔 トリガー発生\n入院時 / 新規薬剤開始 / 退院時"}}
+    H1["🔍 対象患者の事前調査\n（カルテ記事・既往歴・検査値・持参薬）"]:::pain
+    H2["🧠 思考：新規薬剤の妥当性\n腎機能・肝機能の用量確認"]
+    H3["🧠 思考：薬物間相互作用\nの確認"]
+    H4["🧠 思考：指導内容の組み立て\nどのように説明するか"]
+    H5["🧠 思考：カルテ記載の仕方\n算定要件の確認"]
+    H6["✅ 完了確認\n算定実施＋記録完了"]
+  end
+
+  subgraph System["🖥️ System ─ システム・画面"]
+    direction TB
+    S1["💻 電子カルテ\n患者情報・検査結果を参照"]
+    S2["💻 部門システム\n薬剤情報・処方履歴を参照"]
+    S3["💻 電子カルテに\n算定実施登録"]:::pain
+    S4["💻 電子カルテに\n指導内容を記録"]:::pain
+    S5[("🗄️ 部門システム＋電子カルテ\n算定実施・指導記録が保存済み")]
+  end
+
+  %% Main Flow
+  H0 --> S1
+  H0 --> S2
+  S1 --> H1
+  S2 --> H1
+  H1 --> P1
+  P1 --> H2
+  H2 --> H3
+  H3 --> H4
+  H4 --> P2
+  P2 --> P3
+  P3 --> H5
+  H5 --> S3
+  S3 --> S4
+  S4 --> H6
+  H6 --> S5
+
+  %% Class Definitions
+  classDef default fill:#fff,stroke:#333,stroke-width:1px
+  classDef actor fill:#e0e7ff,stroke:#4338ca,stroke-width:2px
+  classDef system fill:#d1fae5,stroke:#059669,stroke-width:1px
+  classDef physical fill:#fef3c7,stroke:#d97706,stroke-width:1px,stroke-dasharray:5 5
+  classDef pain fill:#fee2e2,stroke:#ef4444,stroke-width:4px,color:#b91c1c
+
+  %% Apply classes to subgraph nodes
+  class P1,P3 physical
+  class H0,H1,H2,H3,H4,H5,H6 actor
+  class S1,S2,S3,S4,S5 system
+
+  %% Style subgraphs
+  style Physical fill:#fffbeb,stroke:#d97706,stroke-width:2px,color:#92400e
+  style Human fill:#eef2ff,stroke:#4338ca,stroke-width:2px,color:#312e81
+  style System fill:#ecfdf5,stroke:#059669,stroke-width:2px,color:#064e3b
+        </div>
+      </div>
+    </section>
+
+    <!-- Legend -->
+    <section class="fade-up">
+      <div class="flex items-center gap-2 mb-4">
+        <div class="w-1.5 h-6 bg-gray-400 rounded-full"></div>
+        <h2 class="text-lg font-bold">図の見方（凡例）</h2>
+      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div class="flex items-center gap-3 bg-white rounded-xl border border-[var(--border-subtle)] px-4 py-3">
+          <div class="swatch bg-[#fef3c7] border-2 border-dashed border-[#d97706]"></div>
+          <div>
+            <p class="text-sm font-semibold text-amber-800">Physical</p>
+            <p class="text-xs text-gray-500">物理・アナログ作業</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-3 bg-white rounded-xl border border-[var(--border-subtle)] px-4 py-3">
+          <div class="swatch bg-[#e0e7ff] border-2 border-[#4338ca]"></div>
+          <div>
+            <p class="text-sm font-semibold text-indigo-800">Human</p>
+            <p class="text-xs text-gray-500">担当者の判断・思考</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-3 bg-white rounded-xl border border-[var(--border-subtle)] px-4 py-3">
+          <div class="swatch bg-[#d1fae5] border-2 border-[#059669]"></div>
+          <div>
+            <p class="text-sm font-semibold text-green-800">System</p>
+            <p class="text-xs text-gray-500">システム操作・画面</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-3 bg-white rounded-xl border border-[var(--border-subtle)] px-4 py-3">
+          <div class="swatch bg-[#fee2e2] border-[3px] border-[#ef4444]"></div>
+          <div>
+            <p class="text-sm font-semibold text-red-700">Pain Point</p>
+            <p class="text-xs text-gray-500">課題・ボトルネック</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pain Points Analysis -->
+    <section class="fade-up">
+      <div class="flex items-center gap-2 mb-4">
+        <div class="w-1.5 h-6 bg-red-500 rounded-full"></div>
+        <h2 class="text-lg font-bold">しんどいポイントの解説（ボトルネック分析）</h2>
+      </div>
+      <div class="space-y-4">
+
+        <!-- Pain 1 -->
+        <div class="bg-white rounded-xl border-l-4 border-red-500 shadow-sm p-5 pain-pulse">
+          <div class="flex items-start gap-3">
+            <span class="mt-0.5 text-red-500 text-xl">⏱️</span>
+            <div>
+              <h3 class="font-bold text-red-800 mb-1">1人あたりの指導時間の長期化 → 他患者への波及</h3>
+              <p class="text-sm text-gray-700 leading-relaxed">
+                1回の指導が10〜60分と大きく変動し、症例が複雑な場合は1件で大幅に時間を消費します。
+                1日5件/病棟というノルマがある中、<strong>1件が長引くと残り4件の指導開始が遅延</strong>し、
+                最悪の場合、当日中に全件完了できないリスクがあります。
+                フロー上では「対面での服薬指導（P2）」が最大のボトルネックです。
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pain 2 -->
+        <div class="bg-white rounded-xl border-l-4 border-red-500 shadow-sm p-5">
+          <div class="flex items-start gap-3">
+            <span class="mt-0.5 text-red-500 text-xl">🚨</span>
+            <div>
+              <h3 class="font-bold text-red-800 mb-1">突発的な退院決定への対応</h3>
+              <p class="text-sm text-gray-700 leading-relaxed">
+                退院が急に決定した場合、通常の事前調査→指導→記録の流れを<strong>割り込みで短時間処理</strong>する必要があります。
+                計画していた他患者の指導スケジュールが崩れ、全体のワークフローに連鎖的な遅延を引き起こします。
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pain 3 -->
+        <div class="bg-white rounded-xl border-l-4 border-red-500 shadow-sm p-5">
+          <div class="flex items-start gap-3">
+            <span class="mt-0.5 text-red-500 text-xl">🔍</span>
+            <div>
+              <h3 class="font-bold text-red-800 mb-1">事前情報の取得コストが高い（特殊病態・長期入院）</h3>
+              <p class="text-sm text-gray-700 leading-relaxed">
+                特殊な病態や長期入院患者は、<strong>カルテ記事・検査結果・処方履歴が膨大</strong>で、
+                事前調査（H1）の段階で複数システムを横断しながら情報を集約する必要があります。
+                フロー上では「事前調査（H1）」→「電子カルテ（S1）」「部門システム（S2）」間の往復が負荷の源です。
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pain 4 -->
+        <div class="bg-white rounded-xl border-l-4 border-red-500 shadow-sm p-5">
+          <div class="flex items-start gap-3">
+            <span class="mt-0.5 text-red-500 text-xl">💊</span>
+            <div>
+              <h3 class="font-bold text-red-800 mb-1">新薬の指導準備負荷</h3>
+              <p class="text-sm text-gray-700 leading-relaxed">
+                新薬は既存のナレッジが蓄積されておらず、<strong>添付文書・ガイドラインの確認から指導資料の作成まで</strong>
+                すべてをゼロベースで行う必要があります。通常業務に加えて発生するため、時間圧迫の要因となります。
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pain 5 -->
+        <div class="bg-white rounded-xl border-l-4 border-red-500 shadow-sm p-5">
+          <div class="flex items-start gap-3">
+            <span class="mt-0.5 text-red-500 text-xl">📊</span>
+            <div>
+              <h3 class="font-bold text-red-800 mb-1">算定数の増加プレッシャー</h3>
+              <p class="text-sm text-gray-700 leading-relaxed">
+                算定実施登録（S3）・指導記録（S4）は診療報酬に直結するため、<strong>件数を増やす経営的要請</strong>があります。
+                しかし1件あたりの品質（丁寧な指導）と件数（算定数）はトレードオフの関係にあり、
+                担当者に持続的な負荷がかかる構造になっています。
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Summary Insight -->
+    <section class="fade-up mb-12">
+      <div class="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl border border-indigo-200 p-6">
+        <div class="flex items-center gap-2 mb-3">
+          <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+          <h2 class="text-lg font-bold text-indigo-900">改善の着眼点</h2>
+        </div>
+        <p class="text-sm text-indigo-900 leading-relaxed">
+          本フローの根本的な課題は<strong>「1件あたりの所要時間の変動幅が大きく、かつ並列処理ができない」</strong>という構造にあります。
+          特に事前調査（H1）と対面指導（P2）が時間を消費する主要ステップであり、ここに対して
+          <strong>①事前情報の自動サマリ生成</strong>、<strong>②指導テンプレートの標準化</strong>、
+          <strong>③算定登録・記録入力のワンクリック化</strong>などのアプローチが有効と考えられます。
+        </p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-[var(--border-subtle)] bg-white/50 py-4">
+    <p class="text-center text-xs text-gray-400">業務フロー分析 ─ 薬剤部 服薬指導 ─ Generated by Claude</p>
+  </footer>
+
+  <!-- Mermaid.js -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#e0e7ff',
+        primaryTextColor: '#1a1a2e',
+        primaryBorderColor: '#4338ca',
+        lineColor: '#6b7280',
+        secondaryColor: '#d1fae5',
+        tertiaryColor: '#fef3c7',
+        fontFamily: 'Noto Sans JP, sans-serif',
+        fontSize: '13px'
+      },
+      flowchart: {
+        curve: 'basis',
+        padding: 20,
+        htmlLabels: true,
+        useMaxWidth: true
+      }
+    });
+  </script>
+
+  <!-- Intersection Observer for fade-in -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.style.animationPlayState = 'running';
+          }
+        });
+      }, { threshold: 0.1 });
+
+      document.querySelectorAll('.fade-up').forEach(el => {
+        el.style.animationPlayState = 'paused';
+        observer.observe(el);
+      });
+    });
+  </script>
+
+</body>
+</html>
